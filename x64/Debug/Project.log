@@ -1,8 +1,12 @@
 ﻿  main.cpp
+C:\Users\Szef\Desktop\Nauka\Sem 5\Optymalizacja\Project\main.cpp(57,12): warning C4244: "argument": konwersja z "time_t" do "unsigned int", możliwa utrata danych
+C:\Users\Szef\Desktop\Nauka\Sem 5\Optymalizacja\Project\main.cpp(37,9): warning C4101: "tab2": lokalna zmienna, do której nie istnieje odwołanie
+C:\Users\Szef\Desktop\Nauka\Sem 5\Optymalizacja\Project\main.cpp(38,9): warning C4101: "tab3": lokalna zmienna, do której nie istnieje odwołanie
   matrix.cpp
+C:\Users\Szef\Desktop\Nauka\Sem 5\Optymalizacja\Project\matrix.cpp(574,12): error C2065: "SEP_SYMBOL": niezadeklarowany identyfikator
+C:\Users\Szef\Desktop\Nauka\Sem 5\Optymalizacja\Project\matrix.cpp(593,15): error C2065: "SEP_SYMBOL": niezadeklarowany identyfikator
   ode_solver.cpp
   opt_alg.cpp
   solution.cpp
   user_funs.cpp
   Generowanie kodu...
-  Project.vcxproj -> C:\Users\Szef\Desktop\Nauka\Sem 5\Optymalizacja\Project\x64\Debug\Project.exe

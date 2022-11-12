@@ -1,3 +1,5 @@
+#define USE_MATH_CONSTANTS
+#include"cmath"
 #include"user_funs.h"
 
 matrix ff1T(matrix x, matrix ud1, matrix ud2)

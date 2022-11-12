@@ -1,4 +1,4 @@
-#define _USE_MATH_DEFINES
+ï»¿#define _USE_MATH_DEFINES
 #include"opt_alg.h"
 #include<cmath>
 double* expansion(matrix(*ff)(matrix, matrix, matrix), double x0, double d, double alpha, int Nmax, matrix ud1, matrix ud2)
@@ -65,7 +65,7 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		D.fit_fun(ff, ud1, ud2);
 		for (int i = 0; i <= n - 3; ++i)
 		{
-			cout << abs(m2d(B.x) - m2d(A.x)) << "\n";
+			//cout << abs(m2d(B.x) - m2d(A.x)) << "\n";
 			if (C.y < D.y)
 				B = D;
 			else
@@ -109,7 +109,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 			l = m2d(A.y * (pow(B.x) - pow(C.x)) + B.y * (pow(C.x) - pow(A.x)) + C.y * (pow(A.x) - pow(B.x)));
 			m = m2d(A.y * (B.x - C.x) + B.y * (C.x - A.x) + C.y * (A.x - B.x));
 
-			cout << abs(m2d(B.x) - m2d(A.x)) << "\n";
+			//cout << abs(m2d(B.x) - m2d(A.x)) << "\n";
 
 			if (m <= 0)
 			{
@@ -221,7 +221,7 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		throw ("solution lag(...):\n" + ex_info);
 	}
 }
-//w obu HJ na razie fun2 zosta³ zmieniony na ff1T ¿eby nie by³o errorów
+//w obu HJ na razie fun2 zostaÅ‚ zmieniony na ff1T Å¼eby nie byÅ‚o errorÃ³w
 solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alpha, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
