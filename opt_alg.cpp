@@ -232,7 +232,7 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 		{
 			XB = X;
 			X = HJ_trial(ff, XB, s, ud1, ud2);
-			if (ff1T(X.x) < ff1T(XB.x)) {
+			if (ff(X.x, NULL, NULL) < ff2T(XB.x)) {
 				do
 				{
 					XSB = XB;
@@ -246,7 +246,7 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 						Xopt.flag = 2;
 						return Xopt;
 					}
-				} while (ff1T(X.x) < ff1T(XB.x));
+				} while (ff2T(X.x) < ff2T(XB.x));
 				X = XB;
 			}
 			else
@@ -275,11 +275,11 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 	{
 		for (int i = 0; i < get_dim(XB); i++)
 		{
-			if (ff1T(XB.x + s * pow(M_E, i)) < ff1T(XB.x))
+			if (ff2T(XB.x + s * pow(M_E, i)) < ff2T(XB.x))
 				XB.x = XB.x + s * (pow(M_E, i));
 
 			else
-				if (ff1T(XB.x - s * pow(M_E, i)) < ff1T(XB.x))
+				if (ff2T(XB.x - s * pow(M_E, i)) < ff2T(XB.x))
 					XB.x = XB.x - s * (pow(M_E, i));
 		}
 		return XB;

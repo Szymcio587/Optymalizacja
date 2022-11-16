@@ -1,4 +1,4 @@
-#define USE_MATH_CONSTANTS
+#define _USE_MATH_DEFINES
 #include"cmath"
 #include"user_funs.h"
 
@@ -38,4 +38,12 @@ matrix df1(double t, matrix Y, matrix ud1, matrix ud2)
 	dY(1) = FAout + Fin - FBout;
 	dY(2) = Fin / Y(1) * (Tin - Y(2)) + FAout / Y(1) * (Ta - Y(2));
 	return dY;
+}
+
+
+matrix ff2T(matrix x, matrix ud1, matrix ud2)
+{
+	matrix y;
+	y = pow(x(0), 2) + pow(x(1), 2) - cos(2.5 * M_PI * m2d(x(0))) - cos(2.5 * M_PI * m2d(x(1))) + 2;
+	return y;
 }
