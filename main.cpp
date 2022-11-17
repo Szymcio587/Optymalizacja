@@ -14,10 +14,11 @@ int main()
 	try
 	{
 		lab2();
+		std::cout << "\nskonczylo program\n";
 	}
 	catch (string EX_INFO)
 	{
-		cerr << "ERROR:\n";
+		cerr << "ERROR w mainie:\n";
 		cerr << EX_INFO << endl << endl;
 	}
 	system("pause");
@@ -33,7 +34,7 @@ void lab1()
 	int Nmax = 1000;
 	double* ab;
 	solution opt;
-
+	
 	ab = expansion(ff1R, 100, d, alpha, Nmax);
 	double x = solution::f_calls;
 	cout << x << endl << endl << endl << endl;
@@ -133,14 +134,6 @@ void lab1()
 	//zapis3.close();
 
 
-
-
-
-
-
-
-
-
 	//opt = lag(ff1T, -10, 1, 0.0001, 1e-7, Nmax);
 	//cout << opt << endl;
 	//solution::clear_calls();
@@ -159,11 +152,16 @@ void lab1()
 
 void lab2()
 {
-	double alphaHJ = 0.5, epsilon = 1e-3, s = 0.5;
-	int Nmax = 1000;
-	matrix x0(2, 1, 0.5);
-
-	solution sol1 = HJ(ff2T, x0, s, alphaHJ, epsilon, Nmax, NULL, NULL);
+	//double alphaHJ = 0.5, epsilon = 1e-3, s = 0.5;
+	//int Nmax = 1000;
+	//matrix x0(2, 1, 0.5);
+	//solution sol1 = HJ(ff2T, x0, s, alphaHJ, epsilon, Nmax, NULL, NULL);
+	//solution sol1 = HJ(ff2T, x0, s, alphaHJ, epsilon, Nmax, NULL, NULL);
+	matrix x0(2, 1);
+	matrix s0(2, 1);
+	matrix ud1, ud2;
+	double alpha = 0.5, beta = 0.3, epsilon = 1e-3, Nmax = 200;
+	solution solR = Rosen(ff2T, x0, s0, alpha, beta, epsilon, Nmax, ud1, ud2);
 
 }
 

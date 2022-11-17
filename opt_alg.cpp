@@ -221,46 +221,93 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		throw ("solution lag(...):\n" + ex_info);
 	}
 }
-//w obu HJ na razie fun2 został zmieniony na ff1T żeby nie było errorów
+
 solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alpha, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
+	//try
+	//{
+	//	solution Xopt, XB, XSB, X;
+	//	X = x0;
+	//	do
+	//	{
+	//		XB = X;
+	//		X = HJ_trial(ff, XB, s, ud1, ud2);
+	//		if (ff(X.x, NULL, NULL) < ff2T(XB.x)) {
+	//			do
+	//			{
+	//				XSB = XB;
+	//				XB = X;
+	//				X.x = 2 * XB.x - XSB.x;
+	//				X.y = 2 * XB.y - XSB.y;
+	//				X = HJ_trial(ff, XB, s, ud1, ud2);
+	//				if (solution::f_calls > Nmax)
+	//				{
+	//					Xopt = XB;
+	//					Xopt.flag = 2;
+	//					return Xopt;
+	//				}
+	//			} while (ff2T(X.x) < ff2T(XB.x));
+	//			X = XB;
+	//		}
+	//		else
+	//		{
+	//			s *= alpha;
+	//		}
+	//		if (solution::f_calls > Nmax)
+	//		{
+	//			Xopt = XB;
+	//			Xopt.flag = 1;
+	//			return Xopt;
+	//		}
+	//	} while (s >= epsilon);
+	//	Xopt = XB;
+	//	return Xopt;
+	//}
+	//catch (string ex_info)
+	//{
+	//	throw ("solution HJ(...):\n" + ex_info);
+	//}
+
 	try
 	{
-		solution Xopt, XB, XSB, X;
-		X = x0;
-		do
+		solution XB;
+		solution X(x0);
+		solution Xopt;
+		solution XB_old;
+
+		XB = X;
+		XB.fit_fun(ff, ud1, ud2);
+	
+		while (true)
 		{
-			XB = X;
-			X = HJ_trial(ff, XB, s, ud1, ud2);
-			if (ff(X.x, NULL, NULL) < ff2T(XB.x)) {
-				do
+			X = HJ_trial(ff, XB, s);
+	
+			if (X.y < XB.y)
+			{
+				while (true)
 				{
-					XSB = XB;
+					XB_old = XB;
 					XB = X;
-					X.x = 2 * XB.x - XSB.x;
-					X.y = 2 * XB.y - XSB.y;
-					X = HJ_trial(ff, XB, s, ud1, ud2);
-					if (solution::f_calls > Nmax)
-					{
+					X.x = 2 * XB.x - XB_old.x;
+					X = HJ_trial(ff, X, s);
+					if (X.y >= XB.y || solution::f_calls > Nmax) {
 						Xopt = XB;
-						Xopt.flag = 2;
-						return Xopt;
+						Xopt.flag = 1;
+						break;
 					}
-				} while (ff2T(X.x) < ff2T(XB.x));
-				X = XB;
+				}
 			}
-			else
-			{
-				s *= alpha;
+			else {
+				s = alpha * s;
 			}
-			if (solution::f_calls > Nmax)
-			{
+
+			if (s < epsilon || solution::f_calls > Nmax) {
 				Xopt = XB;
 				Xopt.flag = 1;
-				return Xopt;
+				break;
 			}
-		} while (s >= epsilon);
-		Xopt = XB;
+		}
+	
 		return Xopt;
 	}
 	catch (string ex_info)
@@ -271,17 +318,43 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 
 solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, matrix ud1, matrix ud2)
 {
+	//try
+	//{
+	//	for (int i = 0; i < get_dim(XB); i++)
+	//	{
+	//		if (ff2T(XB.x + s * pow(M_E, i)) < ff2T(XB.x))
+	//			XB.x = XB.x + s * (pow(M_E, i));
+	//
+	//		else
+	//			if (ff2T(XB.x - s * pow(M_E, i)) < ff2T(XB.x))
+	//				XB.x = XB.x - s * (pow(M_E, i));
+	//	}
+	//	return XB;
+	//}
+	//catch (string ex_info)
+	//{
+	//	throw ("solution HJ_trial(...):\n" + ex_info);
+	//}
 	try
 	{
-		for (int i = 0; i < get_dim(XB); i++)
+		solution XBnew;
+		for (int j = 1; j < get_dim(XB); j++)
 		{
-			if (ff2T(XB.x + s * pow(M_E, i)) < ff2T(XB.x))
-				XB.x = XB.x + s * (pow(M_E, i));
-
+			XBnew.x = XB.x + s * pow(2.718, j);
+			if (XBnew.fit_fun(ff, ud1, ud2) < XB.fit_fun(ff, ud1, ud2))
+			{
+				XB.x = XBnew.x;
+			}
 			else
-				if (ff2T(XB.x - s * pow(M_E, i)) < ff2T(XB.x))
-					XB.x = XB.x - s * (pow(M_E, i));
+			{
+				XBnew.x = XB.x - s * pow(2.718, j);
+				if (XBnew.fit_fun(ff, ud1, ud2) < XB.fit_fun(ff, ud1, ud2))
+				{
+					XB.x = XBnew.x;
+				}
+			}
 		}
+
 		return XB;
 	}
 	catch (string ex_info)
@@ -289,15 +362,85 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 		throw ("solution HJ_trial(...):\n" + ex_info);
 	}
 }
-
+//punkt startowy x(0), wektor długość kroków s(0), współczynnik ekspansji α > 1,
+//współczynnik kontrakcji 0 < β < 1, dokładność ε > 0, maksymalna liczba wywołań funkcji celu Nmax
+//macierze Q i D odpowiadają obrotowi bazy
 solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double alpha, double beta, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
 	{
+//zrobić macież s żeby przechowywać długości kroków, zrobić macierz lambda na 2xN żeby przechować ilość udanych kroków i macież p(porażek) na nieudane kroki
+		bool running = true;//zmienna do kończenia pętli głównej funkcji
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		Xopt.f_calls = 0;
+		int n = 2;//zbierać wymiar przestrzeni
+		int j = n;
+		int i = 0;
+		matrix d = new matrix(n, 1, 1);
+		matrix λ = new matrix(n, 1, 0);//poprawne kroki
+		matrix p = new matrix(n, 1, 1);//porażki
+		matrix s = s0;
+		double* e = { 1, 1 };//baza x, y
+
+		double* xB = {x0(0),x0(1)};
+		double x0 = m2d(x0(0));
+		double x1 = m2d(x0(1));
+		//mamy x0, i s0 jako matrixy - tablice 1xn
+		//mamy przesłane alpha, beta, epsilon i Nmax. do tego jest ud1 i ud2
+
+		//punkt startowy x(0), wektor długość kroków s(0), współczynnik ekspansji α > 1,
+		//współczynnik kontrakcji 0 < β < 1, dokładność ε > 0, maksymalna liczba wywołań funkcji celu Nmax
+		//macierze Q i D odpowiadają obrotowi bazy
+		//zapis dj(0) to: tablica d indeks j wyraz 0
+		// indeks chyba oznacza oś np X index 1 to Ox, X indeks 2 to Oy
+		//wektor e to baza
+		d[j] = e[j];	// j = 1, 2, …, n
+		λ[j][n] = 0;		// j = 1, 2, …, n
+		p[j][n] = 0;	    // j = 1, 2, …, n
+		xB = x(0);
+			do {
+				for (int j = 0; j < n; j++) { //sprawdzaj w każdym kierunku
+					if (ff2T(xB + s[j][i] * d[j][i]) < ff2T(xB)) {//przerobić warunek
+							xB = xB + s[j][i] * d[j][i];//rozdzielić na współrzędne
+							λ[j][i + 1] = λ[j][i] + s[j][i];
+							s[j][i + 1] = alpha * s[j][i];
+					}
+					else {
+							s[j][i + 1] = -beta * s[j][i];
+							p[j][i + 1] = p[j][i] + 1;
+					}
+				}
+				i = i + 1;
+				x(i) = xB;
+					//sprawdzaj czy zmiana bazy
+					//czy mamy wykonać obrót?
+					//tak jeżeli w każdym kierunku nastąpiło i przesunięcie i porażka
+				if (λ[j][i] != 0 && p[j][n] != 0) {  // j = 1, 2, …, n
+					//zmiana bazy kierunków dj(i); //dopisać rotacje
+					λ[j][i + 1] = 0;			// j = 1, 2, …, n
+					p[j][i] = 0;			// j = 1, 2, …, n
+					s[j][i] = s[j][0];		// j = 1, 2, …, n
+				}
+				if (Xopt.f_calls > Nmax) { //sprawdzenie czy przekroczono fcalls
+					std::cout << "\nzrypalo sie, za dużo iteracji \n";
+					Xopt.flag = 666;
+					return Xopt;
+				}
+				Xopt.f_calls++;
+
+				//sprawdzenie czy długość kroku przekroczyła minimum
+				for (int dupa_1 = 0; i < n; i++) {
+					for (int dupa_2 = 0; j < n; j++) {
+						if (abs(m2d(s[dupa_1][dupa_2])) < epsilon) {
+							running = false;
+						}
+					}
+				}
+			} while (running);//trzeba badać wartości bezwzględne bo krok może być ujemny
+		//return x * = x(i)		Xopt?
 
 		return Xopt;
+			
 	}
 	catch (string ex_info)
 	{
