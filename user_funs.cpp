@@ -2,6 +2,26 @@
 #include"cmath"
 #include"user_funs.h"
 
+matrix iloczyn_macierzy(matrix A, matrix B, int wiersz_a, int kolumny_a, int wiersz_b, int kolumny_b)
+{
+	if (kolumny_a != wiersz_b)
+	{
+		cout << "Bledne rozmiary macierzy" << endl;
+		cerr << "ERROR:\n";
+
+	}
+	//cout << "Iloczyn macierzy: " << endl;
+	//cout << A << endl << endl << B << endl << endl;
+	matrix C(wiersz_a, kolumny_b, 0.0);
+	for (int i = 0; i < wiersz_a; i++)
+		for (int j = 0; j < kolumny_b; j++)
+			for (int k = 0; k < wiersz_b; k++)
+				C(i, j) += A(i, k) * B(k, j);
+
+	//cout << "=" << endl << C << endl << endl << endl;
+	return C;
+}
+
 matrix ff1T(matrix x, matrix ud1, matrix ud2)
 {
 	matrix y;

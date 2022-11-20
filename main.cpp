@@ -152,16 +152,23 @@ void lab1()
 
 void lab2()
 {
-	//double alphaHJ = 0.5, epsilon = 1e-3, s = 0.5;
-	//int Nmax = 1000;
-	//matrix x0(2, 1, 0.5);
+
+	double s = 0.5;
+	matrix ss(2, 2, s);
+	ss(1, 0) = 0;
+	ss(0, 1) = 0;
+	double alphaHJ = 0.5;
+	double alphaR = 2;
+	double beta = 0.5;
+	double epsilon = 0.001;
+	int Nmax = 1000;
+	matrix x0(2, 1, 0.5);
 	//solution sol1 = HJ(ff2T, x0, s, alphaHJ, epsilon, Nmax, NULL, NULL);
-	//solution sol1 = HJ(ff2T, x0, s, alphaHJ, epsilon, Nmax, NULL, NULL);
-	matrix x0(2, 1);
-	matrix s0(2, 1);
-	matrix ud1, ud2;
-	double alpha = 0.5, beta = 0.3, epsilon = 1e-3, Nmax = 200;
-	solution solR = Rosen(ff2T, x0, s0, alpha, beta, epsilon, Nmax, ud1, ud2);
+	//cout << sol1 << endl;
+	//solution::clear_calls();
+
+	solution sol2 = Rosen(ff2T, x0, ss, alphaR, beta, epsilon, Nmax, NULL, NULL);
+	cout << sol2 << endl;
 
 }
 
