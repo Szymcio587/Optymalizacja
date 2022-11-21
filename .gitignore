@@ -1,0 +1,24 @@
+﻿################################################################################
+# Ten plik .gitignore został utworzony automatycznie przez Microsoft(R) Visual Studio.
+################################################################################
+
+/Debug/main.obj
+/Debug/4tablice.txt
+/Debug/Project.ilk
+/Debug/Project.exe
+/Debug/opt_alg.obj
+/Debug/ode_solver.obj
+/Debug/matrix.obj
+/Debug
+/.vs/Project
+/.vs/Optymka69/config
+/.vs/Optymka69/FileContentIndex
+/.vs/Optymka69/v17/ipch/AutoPCH
+/.vs/Optymka69/v17/.suo
+/.vs/Optymka69/v17/Browse.VC.db
+/.vs/Optymka69/v17/Browse.VC.opendb
+/.vs/Optymka69/v17/Browse.VC.db-wal
+/.vs/Optymka69/v17/Browse.VC.db-shm
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
