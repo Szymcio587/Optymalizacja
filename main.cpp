@@ -162,7 +162,7 @@ void lab2()
 	double beta = 0.5;
 	double epsilon = 0.001;
 	int Nmax = 1000;
-	matrix x0(2, 1, 0.5);
+	matrix x0(2, 1, 0.75);
 	//solution sol1 = HJ(ff2T, x0, s, alphaHJ, epsilon, Nmax, NULL, NULL);
 	//cout << sol1 << endl;
 	//solution::clear_calls();

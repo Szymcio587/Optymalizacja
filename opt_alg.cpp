@@ -414,7 +414,8 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix d
 				break;
 			}
 
-		} while (running);
+		} while (running);//trzeba badać wartości bezwzględne bo krok może być ujemny
+		//return x * = x(i)		Xopt?
 		Xopt = wspolrzedne;
 		Xopt.y = ff2T(wspolrzedne);
 		return Xopt;
