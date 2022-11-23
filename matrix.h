@@ -51,7 +51,8 @@ public:
 	//operator przypisania
 	matrix& operator=(const matrix&);
 
-	//zwraca wskazaną kolumnę macierzy w postaci macierzy nx1 (rezultat zwracany jest przez wartość->użycie operatora nie jest l - wartością)
+	//zwraca wskazaną kolumnę macierzy w postaci macierzy nx1 
+	//(rezultat zwracany jest przez wartość->użycie operatora nie jest l - wartością)
 	matrix operator[](int) const; // throw (string);
 
 	// operatory zwracają wybrany element macierzy(mogą być wykorzystane do konwersji matrix na double)

@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+#include"cmath"
 #include"opt_alg.h"
 #include <windows.h>
 #include <fstream>
@@ -153,23 +155,52 @@ void lab1()
 void lab2()
 {
 
-	double s = 0.5;
-	matrix ss(2, 2, s);
+	double s = 0.5;//zmienna okreœlaj¹ca d³ugoœæ kroku
+	matrix ss(2, 2, s);// matrix d³ugoœci kroku
 	ss(1, 0) = 0;
 	ss(0, 1) = 0;
+
+	//parametry
 	double alphaHJ = 0.5;
 	double alphaR = 2;
 	double beta = 0.5;
 	double epsilon = 0.001;
-	int Nmax = 1000;
+	int Nmax = 100;
+
+	matrix ud1(10, 1, 0.0);//ud1 jako wektor 10x1 o wartoœciach 0
+	ud1(0, 0) = 0.5;//d³ugoœæ ramienia robota
+	ud1(1, 0) = 1;//masa ramienia robota
+	ud1(2, 0) = 9;//masa ciêzarka
+	ud1(3, 0) = M_PI;//k¹t obrotu koñcowy:    pi rad
+	//moment bezw³adnoœci
+	//ciê¿arek jest traktowany jako punkt na koñcu ramienia
+	ud1(4, 0) = ((1 / 3) * ud1(1, 0) * pow((ud1(0, 0)), 2)) + ud1(2, 0) * pow(ud1(0, 0), 2);
+	ud1(5, 0) = 0.5;//wspó³czynnik tarcia
+	ud1(6, 0) = 0.1;//krok czasowy
+	ud1(7, 0) = 0.1;//tend - czas koñcowy
+
+	//warunki pocz¹tkowe i póŸniej kolejne wyrazy zapisu
+	//k¹t0, prêdkoœc koñcowa0, przy³o¿ony moment si³y0, wartoœæ funkcjona³u jakoœci0
+	matrix ud2 = matrix(4, new double[4] { 0, 0, 0, 0 });//warunki pocz¹tkowe
+
+	//matrix punktu startowego
+	//parametry wymiar n, wymiar m, wartoœæi wszystkich wyrazów w tablicy
+	//x0.x i x0.y powinny byæ z przedzia³u [0,10]
 	matrix x0(2, 1, 0.75);
+
 	//solution sol1 = HJ(ff2T, x0, s, alphaHJ, epsilon, Nmax, NULL, NULL);
 	//cout << sol1 << endl;
 	//solution::clear_calls();
 
-	solution sol2 = Rosen(ff2T, x0, ss, alphaR, beta, epsilon, Nmax, NULL, NULL);
+	//funkcja zwraca solution, przyjmuje:
+	//wskaŸnik do funkcji zwracaj¹cej matrix, matrix wspolrzedne (pocz¹tkowe), matrix dlugosc_kroku, 
+	//double alpha, double beta, double epsilon, int Nmax, matrix ud1, matrix ud2
+	//solution sol2 = Rosen(ff2T, x0, ss, alphaR, beta, epsilon, Nmax, ud1, ud2);
+	solution sol2 = Rosen(ff2T, x0, ss, alphaR, beta, epsilon, Nmax, ud1, ud2);
 	cout << sol2 << endl;
 
+	matrix* Z = solve_ode(df2, 0, 1, 1000, ud2, ud1, ud2);
+	cout << Z;
 }
 
 void lab3()

@@ -314,7 +314,7 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix d
 	{
 
 		bool running = true;//zmienna do kończenia pętli głównej funkcji
-		solution Xopt;
+		solution Xopt, X;//przyszły wynik
 		int n = get_dim(wspolrzedne);//zbierać wymiar przestrzeni
 		matrix poczatkowe_wspolrzedne = wspolrzedne;
 		matrix preNowaBaza(n, n, 0.0);
@@ -322,6 +322,7 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix d
 		matrix kierunek(n, n, 0.0);
 		matrix roznica_poczatku_baz(n, n, 0.0);
 
+		//ustalenie początkowej bazy poszukiwań
 		kierunek(0, 0) = 1;
 		kierunek(1, 1) = 1;
 		double x_roznica, y_roznica;
@@ -332,17 +333,17 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix d
 		double dl_kroku;
 		cout << kierunek << endl << endl;
 		do {
+			Xopt.f_calls++;
 			for (int j = 0; j < n; j++)
 			{
-				Xopt.f_calls++;
 				nowe_wspolrzedne = wspolrzedne;
 				nowe_wspolrzedne(0) += (dlugosc_kroku(j, 0) * kierunek(0, 0) + dlugosc_kroku(j, 1) * kierunek(1, 0));
 				nowe_wspolrzedne(1) += (dlugosc_kroku(j, 0) * kierunek(0, 1) + dlugosc_kroku(j, 1) * kierunek(1, 1));
 				// zapisane [x]
 				//			[y]
 
-
-				if (ff2T(wspolrzedne) > ff2T(nowe_wspolrzedne)) //kierunek nie musi być zgodny z osiami
+				//kierunek nie musi być zgodny z osiami
+				if (ff(wspolrzedne, ud1, ud2) > ff(nowe_wspolrzedne, ud1, ud2))
 				{
 					wspolrzedne = nowe_wspolrzedne;
 					lambda(j)++;
@@ -357,14 +358,14 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix d
 				}
 
 			}
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////			
 
 			i++;
+			//zmiana bazy
 			if (porazki(0) * porazki(1) * lambda(0) * lambda(1))
 			{
 				matrix wektor1(n, 1, 0.0);
 				matrix wektor2(n, 1, 0.0);
-				//zmiana bazy dopisać
+
 				x_roznica = poczatkowe_wspolrzedne(0) - wspolrzedne(0);
 				y_roznica = poczatkowe_wspolrzedne(1) - wspolrzedne(1);
 				poczatkowe_wspolrzedne = wspolrzedne;
@@ -404,10 +405,10 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix d
 				porazki(0) = 0;
 				porazki(1) = 0;
 			}
-
+			//warunek przekroczenia maksymalnej ilości iteracji
 			if (i >= Nmax)	break;
 			dl_kroku = sqrt(dlugosc_kroku(0, 0) * dlugosc_kroku(0, 0) + dlugosc_kroku(0, 1) * dlugosc_kroku(0, 1));
-			//cout << dl_kroku << endl;
+			//warunek przekroczenia minimalnej długości kroku
 			if (dl_kroku < epsilon)
 			{
 				Xopt.flag = 0;
@@ -417,7 +418,8 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix d
 		} while (running);//trzeba badać wartości bezwzględne bo krok może być ujemny
 		//return x * = x(i)		Xopt?
 		Xopt = wspolrzedne;
-		Xopt.y = ff2T(wspolrzedne);
+		Xopt.y = ff(wspolrzedne, ud1, ud2);
+		Xopt.flag = 0;
 		return Xopt;
 
 	}

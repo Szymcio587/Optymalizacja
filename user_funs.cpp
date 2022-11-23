@@ -66,3 +66,75 @@ matrix ff2T(matrix x, matrix ud1, matrix ud2)
 	y = pow(x(0), 2) + pow(x(1), 2) - cos(2.5 * M_PI * m2d(x(0))) - cos(2.5 * M_PI * m2d(x(1))) + 2;
 	return y;
 }
+
+matrix ff2R(matrix x, matrix ud1, matrix ud2)
+{
+	matrix y;//macierz wynikowa
+	matrix Y0 = ud2;
+
+	ud1(8, 0) = x(0);
+	ud1(9, 0) = x(1);
+	
+	//warunki brzegowe s¹ podane w mainie i przekazane tu przez ud2
+	//warunki pocz¹tkowe w postaci wektora pionowego o zadanych w {} wartoœciach
+	//w ud1 przekazane s¹ parametry robota podane w instrukcji
+	//póki co warunki pocz¹tkowe s¹ zdublowane, w poprzednim kodzie by³a tam macierz x jako wektor wspó³rzêdnych, teraz wspó³rzêdne s¹ czêœæi¹ ud1
+	matrix* Y = solve_ode(df2, 0, 1, 1000, Y0, ud1, ud2);
+	
+	int n = get_len(Y[0]);//bierze d³ugoœæ wektora wyników
+
+	//y = Y(3);
+
+	//return y;
+	return Y[1](3);
+}
+//ma zwracaæ wektor warunków pocz¹tkowych po zmianie => wektor nx1
+//macierz Y to przes³any wektor warunków pocz¹tkowych danego kroku czasowego o wymiarze nx1
+//jest to kolumna wybrana dla danego kroku czasowego
+matrix df2(double t, matrix Y, matrix ud1, matrix ud2)
+{
+	try {
+		//getsize(ud2)[0] zwraca d³ugoœæ wektora = iloœci zmiennych w kroku czasowym
+		matrix dY(get_size(ud2)[0], 1);//obliczany w funkcji krok czasowy, który potem jest zwracany jako wektor
+
+		//dane
+		//ud1(0, 0) = 0.5;//d³ugoœæ ramienia robota
+		//ud1(1, 0) = 1;//masa ramienia robota
+		//ud1(2, 0) = 9;//masa ciêzarka
+		//ud1(3, 0) = 180;//k¹t obrotu	aref
+		//moment bezw³adnoœci
+		//ciê¿arek jest traktowany jako punkt na koñcu ramienia
+		//ud1(4, 0) = (1 / 3) * ud1(1, 0) * pow((ud1(0, 0)), 2) + ud1(2, 0) * pow(ud1(0, 0), 2);
+		//ud1(5, 0) = 0.5;//wspó³czynnik tarcia
+		//ud1(6, 0) = 0.1;//krok czasowy
+
+		double aref = ud1(3, 0);//referencyjny koñcowy k¹t ruchu
+		double omegaref = 0;//referencyjna koñcowa prêdkoœæ ruchu
+		double dt = ud1(6, 0);
+
+
+		double k1 = ud1(8, 0);	//ud1(8, 0) = x(0);
+		double k2 = ud1(9, 0);	//ud1(9, 0) = x(1);
+		
+		//w ud2 s¹ pocz¹tkowe wartoœci dla alfy i omegi zmieniajace siê w czasie
+		//W otrzymywanym z odesolvera wektorze Y s¹ ostatnie wartoœci alfy, omegii i momentu si³y. w takiej kolejnoœci:
+		//Y(0)k¹t, Y(1)prêdkoœc koñcowa, Y(2)przy³o¿ony moment si³y, Y(3) wartoœæ "y" funkcjona³u jakoœci
+
+		//obliczyæ nowe alfa i nowe omega
+		dY(1) = Y(2) * dt;//nowa prêdkoœæ koñcowa
+		dY(0) = Y(1) * dt;//nowy k¹t
+
+		//obliczenie nowego momentu si³y bazuj¹c na nowych alfie i omedze
+		dY(2) = k1 * (aref - dY(0)) + k2 * (omegaref - dY(1));
+
+		//funkcjona³ jakoœci - sam siê sumuje
+		dY(3) = 10 * pow(aref - dY(0), 2) + pow(omegaref - dY(1), 2) + pow(dY(2), 2);
+
+
+		return dY;
+	}
+	catch (string ex_info)
+	{
+		throw ("df2* sie wywalil(...):\n" + ex_info);
+	}
+}
