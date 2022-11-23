@@ -171,7 +171,7 @@ void lab2()
 	ud1(0, 0) = 0.5;//d³ugoœæ ramienia robota
 	ud1(1, 0) = 1;//masa ramienia robota
 	ud1(2, 0) = 9;//masa ciêzarka
-	ud1(3, 0) = M_PI;//k¹t obrotu koñcowy:    pi rad
+	ud1(3, 0) = 3.14;//k¹t obrotu koñcowy:    pi rad
 	//moment bezw³adnoœci
 	//ciê¿arek jest traktowany jako punkt na koñcu ramienia
 	ud1(4, 0) = ((1 / 3) * ud1(1, 0) * pow((ud1(0, 0)), 2)) + ud1(2, 0) * pow(ud1(0, 0), 2);
@@ -200,7 +200,10 @@ void lab2()
 	cout << sol2 << endl;
 
 	matrix* Z = solve_ode(df2, 0, 1, 1000, ud2, ud1, ud2);
-	cout << Z;
+	cout << Z[1](0) << "\n";
+	cout << Z[1](1) << "\n";
+	cout << Z[1](2) << "\n";
+	cout << Z[1](3) << "\n";
 }
 
 void lab3()

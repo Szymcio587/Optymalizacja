@@ -63,7 +63,7 @@ matrix df1(double t, matrix Y, matrix ud1, matrix ud2)
 matrix ff2T(matrix x, matrix ud1, matrix ud2)
 {
 	matrix y;
-	y = pow(x(0), 2) + pow(x(1), 2) - cos(2.5 * M_PI * m2d(x(0))) - cos(2.5 * M_PI * m2d(x(1))) + 2;
+	y = pow(x(0), 2) + pow(x(1), 2) - cos(2.5 * 3.14 * m2d(x(0))) - cos(2.5 * 3.14 * m2d(x(1))) + 2;
 	return y;
 }
 
@@ -131,6 +131,7 @@ matrix df2(double t, matrix Y, matrix ud1, matrix ud2)
 		dY(3) = 10 * pow(aref - dY(0), 2) + pow(omegaref - dY(1), 2) + pow(dY(2), 2);
 
 
+		//df2 ma siê uruchomiæ tylko raz > rozwi¹zaæ rr-> przekazaæ wynik do ff
 		return dY;
 	}
 	catch (string ex_info)
