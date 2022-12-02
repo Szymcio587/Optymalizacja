@@ -69,7 +69,7 @@ matrix ff2T(matrix x, matrix ud1, matrix ud2)
 
 matrix ff2R(matrix x, matrix ud1, matrix ud2)
 {
-	matrix y;//macierz wynikowa
+	matrix y = 0;//macierz wynikowa
 	matrix Y0 = ud2;
 
 	ud1(8, 0) = x(0);
@@ -83,10 +83,17 @@ matrix ff2R(matrix x, matrix ud1, matrix ud2)
 	
 	int n = get_len(Y[0]);//bierze d³ugoœæ wektora wyników
 
-	//y = Y(3);
+	double aref = ud1(3, 0);
+	double omegaref = 0;
+	//double y = 0;
+	//liczenie funkcjona³u jakoœci
+	for (int i = 0; i < n; i++) {
+		y = y + 10 * pow(aref - Y[1](i, 0), 2) + pow(omegaref - Y[1](i, 1), 2) + 
+					 pow(x(0) * (aref - Y[1](i, 0)) + x(1) * (omegaref - Y[1](i, 1)), 2);
+	}
 
-	//return y;
-	return Y[1](3);
+	return y;
+	
 }
 //ma zwracaæ wektor warunków pocz¹tkowych po zmianie => wektor nx1
 //macierz Y to przes³any wektor warunków pocz¹tkowych danego kroku czasowego o wymiarze nx1
@@ -116,19 +123,15 @@ matrix df2(double t, matrix Y, matrix ud1, matrix ud2)
 		double k1 = ud1(8, 0);	//ud1(8, 0) = x(0);
 		double k2 = ud1(9, 0);	//ud1(9, 0) = x(1);
 		
+		dY(2) = k1 * (aref - Y(0)) + k2 * (omegaref - Y(1));
 		//w ud2 s¹ pocz¹tkowe wartoœci dla alfy i omegi zmieniajace siê w czasie
 		//W otrzymywanym z odesolvera wektorze Y s¹ ostatnie wartoœci alfy, omegii i momentu si³y. w takiej kolejnoœci:
 		//Y(0)k¹t, Y(1)prêdkoœc koñcowa, Y(2)przy³o¿ony moment si³y, Y(3) wartoœæ "y" funkcjona³u jakoœci
 
 		//obliczyæ nowe alfa i nowe omega
-		dY(1) = Y(2) * dt;//nowa prêdkoœæ koñcowa
-		dY(0) = Y(1) * dt;//nowy k¹t
+		dY(0) = Y(1);//nowy k¹t
+		dY(1) = (dY(2) - ud1(5, 0) * Y(1))/ ud1(4, 0);//nowa prêdkoœæ k¹towa
 
-		//obliczenie nowego momentu si³y bazuj¹c na nowych alfie i omedze
-		dY(2) = k1 * (aref - dY(0)) + k2 * (omegaref - dY(1));
-
-		//funkcjona³ jakoœci - sam siê sumuje
-		dY(3) = 10 * pow(aref - dY(0), 2) + pow(omegaref - dY(1), 2) + pow(dY(2), 2);
 
 
 		//df2 ma siê uruchomiæ tylko raz > rozwi¹zaæ rr-> przekazaæ wynik do ff

@@ -196,7 +196,7 @@ void lab2()
 	//wskaünik do funkcji zwracajπcej matrix, matrix wspolrzedne (poczπtkowe), matrix dlugosc_kroku, 
 	//double alpha, double beta, double epsilon, int Nmax, matrix ud1, matrix ud2
 	//solution sol2 = Rosen(ff2T, x0, ss, alphaR, beta, epsilon, Nmax, ud1, ud2);
-	solution sol2 = Rosen(ff2T, x0, ss, alphaR, beta, epsilon, Nmax, ud1, ud2);
+	solution sol2 = Rosen(ff2R, x0, ss, alphaR, beta, epsilon, Nmax, ud1, ud2);
 	cout << sol2 << endl;
 
 	matrix* Z = solve_ode(df2, 0, 1, 1000, ud2, ud1, ud2);
@@ -204,6 +204,9 @@ void lab2()
 	cout << Z[1](1) << "\n";
 	cout << Z[1](2) << "\n";
 	cout << Z[1](3) << "\n";
+
+	cout << sol2.y << "\n";
+	
 }
 
 void lab3()
