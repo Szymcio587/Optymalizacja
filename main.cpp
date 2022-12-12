@@ -1,39 +1,9 @@
-/*********************************************
-Kod stanowi uzupe�nienie materia��w do �wicze�
-w ramach przedmiotu metody optymalizacji.
-Kod udost�pniony na licencji CC BY-SA 3.0
-Autor: dr in�. �ukasz Sztangret
-Katedra Informatyki Stosowanej i Modelowania
-Akademia G�rniczo-Hutnicza
-*********************************************/
-
+﻿#define _USE_MATH_DEFINES
+#include"cmath"
 #include"opt_alg.h"
-#include "xlsxwriter.h"
-#include <iostream>
-
-struct Data {
-	double x0, x, y;
-	int calls;
-};
-
-void writeHeader(lxw_worksheet* worksheet, const char* name, int row, int col) {
-	worksheet_write_string(worksheet, row++, col, name, NULL);
-	worksheet_write_string(worksheet, row, col, "X", NULL);
-	worksheet_write_string(worksheet, row, col + 1, "Y", NULL);
-	worksheet_write_string(worksheet, row, col + 2, "Liczba wywolan", NULL);
-	worksheet_write_string(worksheet, row, col + 3, "Minimum globalne/lokalne", NULL);
-}
-
-void writeData(lxw_worksheet* worksheet, int row, int col, solution opt) {
-	worksheet_write_number(worksheet, row, col, m2d(opt.x), NULL);
-	worksheet_write_number(worksheet, row, col + 1, m2d(opt.y), NULL);
-	worksheet_write_number(worksheet, row, col + 2, opt.f_calls, NULL);
-	if (m2d(opt.x) > 31)
-		worksheet_write_number(worksheet, row, col + 3, 62.73, NULL);
-	else
-		worksheet_write_number(worksheet, row, col + 3, 0, NULL);
-	solution::clear_calls();
-}
+#include <windows.h>
+#include <fstream>
+//#include "xlsxwriter.h"
 
 void lab1();
 void lab2();
@@ -46,7 +16,7 @@ int main()
 {
 	try
 	{
-		lab1();
+		lab2();
 	}
 	catch (string EX_INFO)
 	{
@@ -59,97 +29,117 @@ int main()
 
 void lab1()
 {
-	struct Data data[100];
-	const double d = 1.0, epsilon = 1e-5, gamma = 1e-200;
-	double alpha = 1.2;
-	const int Nmax = 1000;
+	double tab[100][4];
+	double tab2[100][3];
+	double tab3[100][4];
+	double x0 = 100, d = 1.0, alpha = 1.2, epsilon = 1e-5, gamma = 1e-200;
+	int Nmax = 1000;
 	double* ab;
 	solution opt;
 
-	//ab = expansion(ff1T, 100, d, alpha, Nmax);
-	//double x = solution::f_calls;
-	//cout << x << endl << endl;
-	//solution::clear_calls();
+	ab = expansion(ff1T, 100, d, alpha, Nmax);
+	double x = solution::f_calls;
+	cout << x << endl << endl;
+	solution::clear_calls();
 
-	//opt = fib(ff1T, -100, 100, epsilon);
-	//cout << opt << endl << endl;
-	//solution::clear_calls();
+	opt = fib(ff1T, -100, 100, epsilon);
+	cout << opt << endl << endl;
+	solution::clear_calls();
 
-	//opt = lag(ff1T, -100, 100, 0.0001, 1e-7, Nmax);
-	////cout << opt << endl << endl;
-	//solution::clear_calls();
+	opt = lag(ff1T, -100, 100, 0.0001, 1e-7, Nmax);
+	cout << opt << endl << endl;
+	solution::clear_calls();
 
 	srand(time(NULL));
 
-	lxw_workbook* workbook = workbook_new("Cwiczenia_1.xlsx");
-	lxw_worksheet* worksheet = workbook_add_worksheet(workbook, "Tabela 1");
-
-	for (int i = 0; i < 100; i++) 
+	for (int i = 0; i < 100; i++)
 	{
-		data[i].x0 = (rand() % 2000 - 1000);
-		data[i].x0 /= 10;
+		tab[i][0] = (rand() % 201 - 100);
+		ab = expansion(ff1T, tab[i][0], d, alpha, Nmax);
+		tab[i][1] = ab[0];
+		tab[i][2] = ab[1];
+		tab[i][3] = solution::f_calls;
+		solution::clear_calls();
 	}
-
-	worksheet_write_string(worksheet, 1, 1, "Ekspansja", NULL);
-	worksheet_write_string(worksheet, 2, 0, "Wspolczynnik ekspansji", NULL);
-	worksheet_write_string(worksheet, 2, 1, "Punkt startowy", NULL);
-	worksheet_write_string(worksheet, 2, 2, "X", NULL);
-	worksheet_write_string(worksheet, 2, 3, "Y", NULL);
-	worksheet_write_string(worksheet, 2, 4, "Liczba wywolan", NULL);
-	writeHeader(worksheet, "Fibo", 1, 6);
-	writeHeader(worksheet, "Lag", 1, 11);
-
-	for (int q = 0; q < 3; q++) {
-		if (q == 0)
-			alpha = 2;
-		if (q == 1)
-			alpha = 5;
-
-		if (q == 2)
-			alpha = 1.2;
-
-		for (int i = 0; i < 100; i++) 
-		{
-			ab = expansion(ff1T, data[i].x0, d, alpha, Nmax);
-			data[i].x = ab[0];
-			data[i].y = ab[1];
-			data[i].calls = solution::f_calls;
-			solution::clear_calls();
-		}
-
-		int row = 3 + 102 * q, col = 0;
-
-		worksheet_write_number(worksheet, row, col, alpha, NULL);
-
-		for (row; row < 103 + 102 * q; row++) 
-		{
-			worksheet_write_number(worksheet, row, col + 1, data[row - (3 + 102 * q)].x0, NULL);
-			worksheet_write_number(worksheet, row, col + 2, data[row - (3 + 102 * q)].x, NULL);
-			worksheet_write_number(worksheet, row, col + 3, data[row - (3 + 102 * q)].y, NULL);
-			worksheet_write_number(worksheet, row, col + 4, data[row - (3 + 102 * q)].calls, NULL);
-		}
-
-		col += 6;
-
-		for (int row = 3 + 102 * q; row < 103 + 102 * q; row++)
-			writeData(worksheet, row, col, fib(ff1T, data[row - (3 + 102 * q)].x, data[row - (3 + 102 * q)].y, epsilon));
-
-		col += 5;
-
-		
-		for (int row = 3 + 102 * q; row < 103 + 102 * q; row++)
-			writeData(worksheet, row, col, lag(ff1T, data[row - (3 + 102 * q)].x, data[row - (3 + 102 * q)].y, 0.0001, 1e-7, Nmax));
-	}
-	
-
-	lxw_worksheet* worksheet_2 = workbook_add_worksheet(workbook, "Tabela 2");
-	workbook_close(workbook);
 
 }
 
 void lab2()
 {
+	double s = 0.5;
 
+	//parametry
+	double alphaHJ = 0.5;
+	double alphaR = 2;
+	double beta = 0.5;
+	double epsilon = 0.001;
+	int Nmax = 100;
+
+	matrix ud1(10, 1, 0.0);//ud1 jako wektor 10x1 o wartoiach 0
+	ud1(0, 0) = 0.5;//d逝go ramienia robota
+	ud1(1, 0) = 1;//masa ramienia robota
+	ud1(2, 0) = 9;//masa ci瞛arka
+	ud1(3, 0) = 3.14;//k靖 obrotu ko鎍owy:    pi rad
+	//moment bezw豉dnoi
+	//ci篹arek jest traktowany jako punkt na ko鎍u ramienia
+	ud1(4, 0) = ((1 / 3) * ud1(1, 0) * pow((ud1(0, 0)), 2)) + ud1(2, 0) * pow(ud1(0, 0), 2);
+	ud1(5, 0) = 0.5;//wsp馧czynnik tarcia
+	ud1(6, 0) = 0.1;//krok czasowy
+	ud1(7, 0) = 0.1;//tend - czas ko鎍owy
+
+	//warunki pocz靖kowe i p�niej kolejne wyrazy zapisu
+	//k靖0, pr璠ko ko鎍owa0, przy這穎ny moment si造0, warto funkcjona逝 jakoi0
+	matrix ud2 = matrix(4, new double[4] { 0, 0, 0, 0 });//warunki pocz靖kowe
+
+	//matrix punktu startowego
+	//parametry wymiar n, wymiar m, wartoi wszystkich wyraz闚 w tablicy
+	//x0.x i x0.y powinny by� z przedzia逝 [0,10]
+	matrix x0(2, 1, 0.75);
+
+	solution sol1 = HJ(ff2R, x0, s, alphaHJ, epsilon, Nmax, NULL, NULL);
+	cout << sol1 << endl;
+	solution::clear_calls();
+
+	//srand(time(NULL));
+	//lxw_workbook* workbook = workbook_new("Cwiczenia_2.xlsx");
+	//lxw_worksheet* worksheet = workbook_add_worksheet(workbook, "Tabela 1");
+	//matrix x0[100];
+	//double X[2];
+	//for (int j = 0; j < 3; j++) {
+	//	//double s = ((double)rand() / RAND_MAX) * 5;
+	//	double s = 0.5;
+	//	matrix ss(2, 2, s);
+	//	ss(1, 0) = 0;
+	//	ss(0, 1) = 0;
+	//	for (int i = 0; i < 100; i++)
+	//	{
+	//		//X[0] = ((double)rand() / RAND_MAX) * 10;
+	//		//X[1] = ((double)rand() / RAND_MAX) * 10;
+	//		X[0] = 1;
+	//		X[1] = 1;
+	//		x0[i] = matrix(2, X);
+	//		cout << x0[i] << endl;
+	//		worksheet_write_number(worksheet, 100 * j + i + 1, 1, X[0], NULL);
+	//		worksheet_write_number(worksheet, 100 * j + i + 1, 2, X[1], NULL);
+	//		solution sol1 = HJ(ff2R, x0[i], s, alphaR, epsilon, Nmax, NULL, NULL);
+	//		//cout << sol1 << endl;
+	//		worksheet_write_number(worksheet, 100 * j + i + 1, 3, m2d(sol1.x(0, 0)), NULL);
+	//		worksheet_write_number(worksheet, 100 * j + i + 1, 4, m2d(sol1.x(0, 0)), NULL);
+	//		worksheet_write_number(worksheet, 100 * j + i + 1, 5, m2d(sol1.y), NULL);
+	//		worksheet_write_number(worksheet, 100 * j + i + 1, 6, sol1.f_calls, NULL);
+	//		worksheet_write_number(worksheet, 100 * j + i + 1, 7, sol1.flag, NULL);
+	//		sol1.clear_calls();
+	//		solution sol2 = Rosen(ff2R, x0[i], ss, alphaR, beta, epsilon, Nmax, ud1, ud2);
+	//		//cout << sol2 << endl;
+	//		worksheet_write_number(worksheet, 100 * j + i + 1, 8, m2d(sol2.x(0, 0)), NULL);
+	//		worksheet_write_number(worksheet, 100 * j + i + 1, 9, m2d(sol2.x(0, 0)), NULL);
+	//		worksheet_write_number(worksheet, 100 * j + i + 1, 10, m2d(sol2.y), NULL);
+	//		worksheet_write_number(worksheet, 100 * j + i + 1, 11, sol2.f_calls, NULL);
+	//		worksheet_write_number(worksheet, 100 * j + i + 1, 12, sol2.flag, NULL);
+	//		sol2.clear_calls();
+	//	}
+	//}
+	//workbook_close(workbook);
 }
 
 void lab3()

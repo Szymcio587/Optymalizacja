@@ -17,62 +17,62 @@ class matrix
 	int n, m;
 	double** M;
 
-#pragma region funkcje_zaprzyjaźnione
+#pragma region funkcje_zaprzyjaŸnione
 	//zwraca wymiary macierzy n oraz m
 	friend int* get_size(const matrix&);
 
-	//zwraca długość wektora pionowego n (macierzy nx1) 
+	//zwraca d³ugoœæ wektora pionowego n (macierzy nx1) 
 	friend int get_len(const matrix&); // throw (string);
 #pragma endregion
 
 public:
-	//Zmienna typu double, jak również zmienna typu int, jest konwertowana na macierz 1x1!
+	//Zmienna typu double, jak równie¿ zmienna typu int, jest konwertowana na macierz 1x1!
 #pragma region konstruktory
-	//tworzy macierz 1x1 o podanej wartości. Jest również wykorzystywanyjako konstruktor konwertujący(zamienia m.in. double i int na matrix)
+	//tworzy macierz 1x1 o podanej wartoœci. Jest równie¿ wykorzystywanyjako konstruktor konwertuj¹cy(zamienia m.in. double i int na matrix)
 	matrix(double = 0.0);
 
-	//tworzy macierz nxm, której każdy element jest równy trzeciemu argumentowi
+	//tworzy macierz nxm, której ka¿dy element jest równy trzeciemu argumentowi
 	matrix(int, int, double = 0.0); // throw (string);
 
-	//tworzy macierz nx1 (wektor pionowy) i wypełnia wartościami podanymi w tablicy 1D
+	//tworzy macierz nx1 (wektor pionowy) i wype³nia wartoœciami podanymi w tablicy 1D
 	matrix(int, double*); // throw (string);
 
-	//tworzy macierz nxm i wypełnia wartościami podanymi w tablicy 2D
+	//tworzy macierz nxm i wype³nia wartoœciami podanymi w tablicy 2D
 	matrix(int, int, double**); // throw (string);
 
-	//konstruktor kopiujący
+	//konstruktor kopiuj¹cy
 	matrix(const matrix&);
 	//destruktor
 	~matrix();
 #pragma endregion
 
-	//Składowe funkcje operatorowe: 
+	//Sk³adowe funkcje operatorowe: 
 #pragma region operatory
 	//operator przypisania
 	matrix& operator=(const matrix&);
 
-	//zwraca wskazaną kolumnę macierzy w postaci macierzy nx1 (rezultat zwracany jest przez wartość->użycie operatora nie jest l - wartością)
+	//zwraca wskazan¹ kolumnê macierzy w postaci macierzy nx1 (rezultat zwracany jest przez wartoœæ->u¿ycie operatora nie jest l - wartoœci¹)
 	matrix operator[](int) const; // throw (string);
 
-	// operatory zwracają wybrany element macierzy(mogą być wykorzystane do konwersji matrix na double)
+	// operatory zwracaj¹ wybrany element macierzy(mog¹ byæ wykorzystane do konwersji matrix na double)
 	double& operator()(int = 0, int = 0); // throw (string);
 	double operator()(int = 0, int = 0) const; // throw (string);
 #pragma endregion
 
-#pragma region funkcje_składowe
-	//wstawia we wskazaną kolumnę wektor pionowy (macierz nx1)
+#pragma region funkcje_sk³adowe
+	//wstawia we wskazan¹ kolumnê wektor pionowy (macierz nx1)
 	void set_col(const matrix&, int); // throw (string);
 
 	//wstawia we wskazany wiersz wektor poziomy (macierz 1xm)
 	void set_row(const matrix&, int); // throw (string);
 
-	//dodaje do macierzy nową kolumnę i wypełnia ją podaną wartością
+	//dodaje do macierzy now¹ kolumnê i wype³nia j¹ podan¹ wartoœci¹
 	void add_col(double = 0.0);
 
-	//dodaje do macierzy nowywiersz i wypełnia go podaną wartością
+	//dodaje do macierzy nowywiersz i wype³nia go podan¹ wartoœci¹
 	void add_row(double = 0.0);
 
-	//dodaje do macierzy nową kolumnę i wstawia w nią podany wektor pionowy(macierz nx1)
+	//dodaje do macierzy now¹ kolumnê i wstawia w ni¹ podany wektor pionowy(macierz nx1)
 	void add_col(const matrix&); // throw (string);
 
 	//dodaje do macierzy nowy wiersz i wstawie w niego podany wektor poziomu(macierz 1xm)
@@ -81,7 +81,7 @@ public:
 };
 
 #pragma region globalne_funkcje_operatorowe
-//operatory wykonują odpowiednie działanie pod warunkiem zgodności wymiarów macierzy
+//operatory wykonuj¹ odpowiednie dzia³anie pod warunkiem zgodnoœci wymiarów macierzy
 matrix operator+(const matrix&, const matrix&); // throw (string);
 matrix operator-(const matrix&, const matrix&); // throw (string);
 matrix operator*(const matrix&, const matrix&); // throw (string);
@@ -90,7 +90,7 @@ matrix operator/(const matrix&, const matrix&); // throw (string);
 //macierz przeciwna
 matrix operator-(const matrix&);
 
-//operatory relacji działają tylko dla macierzy 1x1
+//operatory relacji dzia³aj¹ tylko dla macierzy 1x1
 bool operator<(const matrix&, const matrix&); // throw (string);
 bool operator>(const matrix&, const matrix&); // throw (string);
 bool operator<=(const matrix&, const matrix&); // throw (string);
@@ -98,21 +98,21 @@ bool operator>=(const matrix&, const matrix&); // throw (string);
 bool operator==(const matrix&, const matrix&); // throw (string);
 bool operator!=(const matrix&, const matrix&); // throw (string);
 
-//wypisanie macierzy na ekran lub do pliku csv.Podczas wypisywani elementów macierzy, część całkowita oddzielona jest od części		ułamkowej za pomocą zdefiniowanego w linii 13 SEP_SYMBOL
+//wypisanie macierzy na ekran lub do pliku csv.Podczas wypisywani elementów macierzy, czêœæ ca³kowita oddzielona jest od czêœci		u³amkowej za pomoc¹ zdefiniowanego w linii 13 SEP_SYMBOL
 ostream& operator<<(ostream&, const matrix&);
 
-//odczyt macierzy z pliku csv, txt lub klawiatury.Podając elementy macierzy należy pamiętać, że każda liczba musi kończyć się znakiem; Podczas	wprowadzania elementów macierzy, część całkowita może być oddzielona od części ułamkowej za pomocą zdefiniowanego w linii 13 SEP_SYMBOL lub . 
+//odczyt macierzy z pliku csv, txt lub klawiatury.Podaj¹c elementy macierzy nale¿y pamiêtaæ, ¿e ka¿da liczba musi koñczyæ siê znakiem; Podczas	wprowadzania elementów macierzy, czêœæ ca³kowita mo¿e byæ oddzielona od czêœci u³amkowej za pomoc¹ zdefiniowanego w linii 13 SEP_SYMBOL lub . 
 istream& operator>>(istream&, matrix&); // throw (string);
 #pragma endregion
 
 #pragma region funkcje_globalne
-//tworzy macierz jednostkową nxn 
+//tworzy macierz jednostkow¹ nxn 
 matrix ident_mat(int = 1); // throw (string);
 
-//tworzy macierz nxm i wypełnia wartościami losowymi z przedziału[0, 1] o rozkładzie jednostajnym
+//tworzy macierz nxm i wype³nia wartoœciami losowymi z przedzia³u[0, 1] o rozk³adzie jednostajnym
 matrix rand_mat(int = 1, int = 1); // throw (string);
 
-//tworzy macierz nxm i wypełnia wartościami	losowymi o standardowym rozkładzie normalnym
+//tworzy macierz nxm i wype³nia wartoœciami	losowymi o standardowym rozk³adzie normalnym
 matrix randn_mat(int = 1, int = 1); // throw (string);
 
 //zamiana macierzy 1x1 na double
@@ -127,23 +127,22 @@ matrix inv(const matrix&); // throw (string);
 //– macierz transponowana
 matrix trans(const matrix&);
 
-//podnosi macierz do potęgi domyślnie 2
+//podnosi macierz do potêgi domyœlnie 2
 matrix pow(const matrix&, int = 2); // throw (string);
 
-//oblicza normę z wektora pionowego (macierzy nx1)
+//oblicza normê z wektora pionowego (macierzy nx1)
 double norm(const matrix&); // throw (string);
 
-//poziome połączenie dwóch macierzy
+//poziome po³¹czenie dwóch macierzy
 matrix hcat(const matrix&, const matrix&); // throw (string);
 
-//pionowe połączenie dwóch macierzy
+//pionowe po³¹czenie dwóch macierzy
 matrix vcat(const matrix&, const matrix&); // throw (string);
 
-//zwraca wskazaną kolumnę macierzy w postaci wektora pionowego(macierzy nx1)
+//zwraca wskazan¹ kolumnê macierzy w postaci wektora pionowego(macierzy nx1)
 matrix get_col(const matrix&, int); // throw (string);
 
 //zwraca wskazany wiersz macierzy w postaci wektora	poziomego(macierzy 1xm)
 matrix get_row(const matrix&, int); // throw (string);
 #pragma endregion
-
 

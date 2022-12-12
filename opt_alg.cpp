@@ -221,47 +221,40 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		throw ("solution lag(...):\n" + ex_info);
 	}
 }
-//w obu HJ na razie fun2 został zmieniony na ff1T żeby nie było errorów
+
 solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alpha, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
 	{
-		solution Xopt, XB, XSB, X;
-		X = x0;
-		do
+		solution XB, XB_old, X;
+		XB.x = x0;
+		XB.fit_fun(ff, ud1, ud2);
+		while (true)
 		{
-			XB = X;
+
 			X = HJ_trial(ff, XB, s, ud1, ud2);
-			if (ff1T(X.x) < ff1T(XB.x)) {
-				do
+			//cout << X.x(0) << " " << X.x(1) << endl;
+			if (X.y < XB.y)
+			{
+				while (true)
 				{
-					XSB = XB;
+					XB_old = XB;
 					XB = X;
-					X.x = 2 * XB.x - XSB.x;
-					X.y = 2 * XB.y - XSB.y;
-					X = HJ_trial(ff, XB, s, ud1, ud2);
-					if (solution::f_calls > Nmax)
-					{
-						Xopt = XB;
-						Xopt.flag = 2;
-						return Xopt;
-					}
-				} while (ff1T(X.x) < ff1T(XB.x));
-				X = XB;
+					X.x = XB.x + XB.x - XB_old.x;
+
+					X.fit_fun(ff, ud1, ud2);
+					X = HJ_trial(ff, X, s, ud1, ud2);
+					if (X.y >= XB.y)
+						break;
+					if (XB.f_calls > Nmax)
+						return XB;
+				}
 			}
 			else
-			{
 				s *= alpha;
-			}
-			if (solution::f_calls > Nmax)
-			{
-				Xopt = XB;
-				Xopt.flag = 1;
-				return Xopt;
-			}
-		} while (s >= epsilon);
-		Xopt = XB;
-		return Xopt;
+			if (XB.f_calls > Nmax || s < epsilon)
+				return XB;
+		}
 	}
 	catch (string ex_info)
 	{
@@ -273,31 +266,150 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 {
 	try
 	{
-		for (int i = 0; i < get_dim(XB); i++)
-		{
-			if (ff1T(XB.x + s * pow(M_E, i)) < ff1T(XB.x))
-				XB.x = XB.x + s * (pow(M_E, i));
+		int n = get_dim(XB);
+		solution X;
+		matrix d = ident_mat(n);
+		for (int i = 0; i < n; i++) {
+			X.x = XB.x + s * d[i];
+			X.fit_fun(ff, ud1, ud2);
+			if (X.y < XB.y) {
+				XB = X;
+			}
+			else {
+				X.x = XB.x - s * d[i];
+				X.fit_fun(ff, ud1, ud2);
+				if (X.y < XB.y) {
+					XB = X;
+				}
 
-			else
-				if (ff1T(XB.x - s * pow(M_E, i)) < ff1T(XB.x))
-					XB.x = XB.x - s * (pow(M_E, i));
+			}
+
 		}
 		return XB;
 	}
+
 	catch (string ex_info)
 	{
 		throw ("solution HJ_trial(...):\n" + ex_info);
 	}
 }
-
-solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix x0, matrix s0, double alpha, double beta, double epsilon, int Nmax, matrix ud1, matrix ud2)
+//punkt startowy x(0), wektor długość kroków s(0), współczynnik ekspansji α > 1,
+//współczynnik kontrakcji 0 < β < 1, dokładność ε > 0, maksymalna liczba wywołań funkcji celu Nmax
+//macierze Q i D odpowiadają obrotowi bazy
+solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix dlugosc_kroku, double alpha, double beta, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
 	{
-		solution Xopt;
-		//Tu wpisz kod funkcji
 
+		bool running = true;//zmienna do kończenia pętli głównej funkcji
+		solution Xopt, X;//przyszły wynik
+		int n = get_dim(wspolrzedne);//zbierać wymiar przestrzeni
+		matrix poczatkowe_wspolrzedne = wspolrzedne;
+		matrix preNowaBaza(n, n, 0.0);
+		matrix nowe_wspolrzedne(n, 1, 0.0);
+		matrix kierunek(n, n, 0.0);
+		matrix roznica_poczatku_baz(n, n, 0.0);
+
+		//ustalenie początkowej bazy poszukiwań
+		kierunek(0, 0) = 1;
+		kierunek(1, 1) = 1;
+		double x_roznica, y_roznica;
+
+		int i = 0;
+		matrix lambda(n, 1, 0.0);//poprawne kroki
+		matrix porazki(n, 1, 0.0);//porażki
+		double dl_kroku;
+		cout << kierunek << endl << endl;
+		do {
+			Xopt.f_calls++;
+			for (int j = 0; j < n; j++)
+			{
+				nowe_wspolrzedne = wspolrzedne;
+				nowe_wspolrzedne(0) += (dlugosc_kroku(j, 0) * kierunek(0, 0) + dlugosc_kroku(j, 1) * kierunek(1, 0));
+				nowe_wspolrzedne(1) += (dlugosc_kroku(j, 0) * kierunek(0, 1) + dlugosc_kroku(j, 1) * kierunek(1, 1));
+				// zapisane [x]
+				//			[y]
+
+				//kierunek nie musi być zgodny z osiami
+				if (ff(wspolrzedne, ud1, ud2) > ff(nowe_wspolrzedne, ud1, ud2))
+				{
+					wspolrzedne = nowe_wspolrzedne;
+					lambda(j)++;
+					dlugosc_kroku(j, 0) *= alpha;
+					dlugosc_kroku(j, 1) *= alpha;
+				}
+				else
+				{
+					dlugosc_kroku(j, 0) *= -beta;
+					dlugosc_kroku(j, 1) *= -beta;
+					porazki(j)++;
+				}
+
+			}
+
+			i++;
+			//zmiana bazy
+			if (porazki(0) * porazki(1) * lambda(0) * lambda(1))
+			{
+				matrix wektor1(n, 1, 0.0);
+				matrix wektor2(n, 1, 0.0);
+
+				x_roznica = poczatkowe_wspolrzedne(0) - wspolrzedne(0);
+				y_roznica = poczatkowe_wspolrzedne(1) - wspolrzedne(1);
+				poczatkowe_wspolrzedne = wspolrzedne;
+
+				roznica_poczatku_baz(0, 0) = x_roznica;
+				roznica_poczatku_baz(1, 0) = y_roznica;
+				roznica_poczatku_baz(1, 1) = y_roznica;
+
+				//nowy_kierunek(0, 0) = (kierunek(0, 0) * roznica_poczatku_baz(0, 0) + kierunek(0, 1) * roznica_poczatku_baz(1, 0));
+				//nowy_kierunek(0, 1) = (kierunek(0, 0) * roznica_poczatku_baz(0, 1) + kierunek(0, 1) * roznica_poczatku_baz(1, 1));
+				//nowy_kierunek(1, 0) = (kierunek(1, 0) * roznica_poczatku_baz(0, 0) + kierunek(1, 1) * roznica_poczatku_baz(1, 0));
+				//nowy_kierunek(1, 1) = (kierunek(1, 0) * roznica_poczatku_baz(0, 1) + kierunek(1, 1) * roznica_poczatku_baz(1, 1));
+
+				preNowaBaza = iloczyn_macierzy(kierunek, roznica_poczatku_baz, 2, 2, 2, 2);
+				wektor1(0, 0) = preNowaBaza(0, 1);
+				wektor1(1, 0) = preNowaBaza(1, 1);
+				wektor2(0, 0) = dlugosc_kroku(1, 0);
+				wektor2(1, 0) = dlugosc_kroku(1, 1);
+				wektor1 = trans(wektor1);
+				wektor1 = iloczyn_macierzy(wektor1, wektor2, 1, 2, 2, 1);
+				wektor2(0, 0) = wektor2(0, 0) * wektor1(0);
+				wektor2(1, 0) = wektor2(1, 0) * wektor1(0);
+				//cout << "wektor2: " << endl << wektor2 << endl;
+				// to wszystko miało służyć obliczeniu drugiego wektora, ale nie dziala nie wiem czemu
+				//dlatego oszukam system :P
+				//preNowaBaza(0, 1) -= wektor2(1, 0);
+				//preNowaBaza(1, 1) -= wektor2(1, 0);
+				preNowaBaza(0, 1) = -preNowaBaza(1, 0);
+				preNowaBaza(1, 1) = preNowaBaza(0, 0);
+
+
+				kierunek = preNowaBaza;
+				//cout << endl << endl << "Nowa baza poczatkowa:" << endl << wspolrzedne << endl << endl << endl;
+				//cout << kierunek << endl << endl;
+				lambda(0) = 0;
+				lambda(1) = 0;
+				porazki(0) = 0;
+				porazki(1) = 0;
+			}
+			//warunek przekroczenia maksymalnej ilości iteracji
+			if (i >= Nmax)	break;
+			dl_kroku = sqrt(dlugosc_kroku(0, 0) * dlugosc_kroku(0, 0) + dlugosc_kroku(0, 1) * dlugosc_kroku(0, 1));
+			//warunek przekroczenia minimalnej długości kroku
+			if (dl_kroku < epsilon)
+			{
+				Xopt.flag = 0;
+				break;
+			}
+
+		} while (running);//trzeba badać wartości bezwzględne bo krok może być ujemny
+		//return x * = x(i)		Xopt?
+		Xopt = wspolrzedne;
+		Xopt.y = ff(wspolrzedne, ud1, ud2);
+		Xopt.flag = 0;
 		return Xopt;
+
 	}
 	catch (string ex_info)
 	{
