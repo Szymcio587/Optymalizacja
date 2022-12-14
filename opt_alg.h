@@ -24,3 +24,4 @@ solution Powell(matrix(*ff)(matrix, matrix, matrix), matrix x0, double epsilon, 
 
 solution EA(matrix(*ff)(matrix, matrix, matrix), int N, matrix limits, int mi, int lambda, matrix sigma0, double epsilon, int Nmax, matrix ud1 = NAN, matrix ud2 = NAN); // throw (string);
 
+matrix iloczyn_macierzy(matrix A, matrix B, int wiersz_a, int kolumny_a, int wiersz_b, int kolumny_b);

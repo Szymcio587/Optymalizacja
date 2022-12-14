@@ -32,6 +32,7 @@ matrix* solve_ode(matrix(*diff)(double, matrix, matrix, matrix), double t0, doub
 			for (int j = 0; j < n; ++j)//przypisanie nieco skorygowanej sumy jako kolumna tablicy
 				S[1](j, i) = S[1](j, i - 1) + (k1(j) + 2 * k2(j) + 2 * k3(j) + k4(j)) / 6;
 		}
+		std::cout << S[1] << std::endl;
 		S[1] = trans(S[1]);
 		return S;
 	}

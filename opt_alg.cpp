@@ -1,6 +1,8 @@
 ﻿#define _USE_MATH_DEFINES
 #include"opt_alg.h"
 #include<cmath>
+#include <fstream>
+
 double* expansion(matrix(*ff)(matrix, matrix, matrix), double x0, double d, double alpha, int Nmax, matrix ud1, matrix ud2)
 {
 	try
@@ -52,6 +54,8 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 {
 	try
 	{
+		ofstream b_a("b-a.txt");
+
 		solution Xopt;
 		Xopt.ud = b - a;
 		int n = static_cast<int>(ceil(log2(sqrt(5) * (b - a) / epsilon) / log2((1 + sqrt(5)) / 2)));
@@ -65,7 +69,8 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		D.fit_fun(ff, ud1, ud2);
 		for (int i = 0; i <= n - 3; ++i)
 		{
-			//cout << abs(m2d(B.x) - m2d(A.x)) << "\n";
+			//b_a << abs(m2d(B.x) - m2d(A.x)) << "\n";
+			//cout << abs(m2d(B.x)-m2d(A.x)) << "\n";
 			if (C.y < D.y)
 				B = D;
 			else
@@ -79,6 +84,8 @@ solution fib(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		}
 		Xopt = C;
 		Xopt.flag = 0;
+
+		b_a.close();
 		return Xopt;
 	}
 	catch (string ex_info)
@@ -98,9 +105,9 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 		solution A(a), B(b), C, D, D_old(a);
 		C.x = (a + b) / 2;
 
-		A.fit_fun(ff1T, ud1, ud2);
-		B.fit_fun(ff1T, ud1, ud2);
-		C.fit_fun(ff1T, ud1, ud2);
+		A.fit_fun(fun1, ud1, ud2);
+		B.fit_fun(fun1, ud1, ud2);
+		C.fit_fun(fun1, ud1, ud2);
 
 		double l, m;
 
@@ -109,7 +116,8 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 			l = m2d(A.y * (pow(B.x) - pow(C.x)) + B.y * (pow(C.x) - pow(A.x)) + C.y * (pow(A.x) - pow(B.x)));
 			m = m2d(A.y * (B.x - C.x) + B.y * (C.x - A.x) + C.y * (A.x - B.x));
 
-			//cout << abs(m2d(B.x) - m2d(A.x)) << "\n";
+			cout << abs(m2d(B.x)) << " " << abs(m2d(A.x)) << "\n";
+			cout << abs(m2d(B.x) - m2d(A.x)) << "\n";
 
 			if (m <= 0)
 			{
@@ -119,7 +127,11 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 			}
 
 			D.x = 0.5 * l / m;
-			D.fit_fun(ff1T, ud1, ud2);
+			D.fit_fun(fun1, ud1, ud2);
+
+			//cout << abs(m2d(B.x)) << " " << abs(m2d(A.x)) << "\n";
+			//cout << abs(m2d(B.x) - m2d(A.x)) << "\n";
+			//cout << m2d(D.x) << m2d(D.y) << "\n\n\n";
 
 			if (A.x <= D.x && D.x <= C.x)
 			{
@@ -129,9 +141,9 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 					C.x = D.x;
 					B.x = C.x;
 
-					A.fit_fun(ff1T, ud1, ud2);
-					B.fit_fun(ff1T, ud1, ud2);
-					C.fit_fun(ff1T, ud1, ud2);
+					A.fit_fun(fun1, ud1, ud2);
+					B.fit_fun(fun1, ud1, ud2);
+					C.fit_fun(fun1, ud1, ud2);
 				}
 				else
 				{
@@ -139,9 +151,9 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 					C.x = C.x;
 					B.x = B.x;
 
-					A.fit_fun(ff1T, ud1, ud2);
-					B.fit_fun(ff1T, ud1, ud2);
-					C.fit_fun(ff1T, ud1, ud2);
+					A.fit_fun(fun1, ud1, ud2);
+					B.fit_fun(fun1, ud1, ud2);
+					C.fit_fun(fun1, ud1, ud2);
 				}
 			}
 			else if (C.x <= D.x && D.x <= B.x)
@@ -152,9 +164,9 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 					B.x = B.x;
 					C.x = D.x;
 
-					A.fit_fun(ff1T, ud1, ud2);
-					B.fit_fun(ff1T, ud1, ud2);
-					C.fit_fun(ff1T, ud1, ud2);
+					A.fit_fun(fun1, ud1, ud2);
+					B.fit_fun(fun1, ud1, ud2);
+					C.fit_fun(fun1, ud1, ud2);
 
 				}
 				else
@@ -163,55 +175,73 @@ solution lag(matrix(*ff)(matrix, matrix, matrix), double a, double b, double eps
 					C.x = C.x;
 					A.x = A.x;
 
-					A.fit_fun(ff1T, ud1, ud2);
-					B.fit_fun(ff1T, ud1, ud2);
-					C.fit_fun(ff1T, ud1, ud2);
+					A.fit_fun(fun1, ud1, ud2);
+					B.fit_fun(fun1, ud1, ud2);
+					C.fit_fun(fun1, ud1, ud2);
 				}
 			}
 			else
 			{
-				A.fit_fun(ff1T, ud1, ud2);
-				B.fit_fun(ff1T, ud1, ud2);
-				C.fit_fun(ff1T, ud1, ud2);
+				A.fit_fun(fun1, ud1, ud2);
+				B.fit_fun(fun1, ud1, ud2);
+				C.fit_fun(fun1, ud1, ud2);
 
 				Xopt = D_old;
 				Xopt.flag = 2;
+
+				cout << abs(m2d(B.x)) << " " << abs(m2d(A.x)) << "\n";
+				cout << abs(m2d(B.x) - m2d(A.x)) << "\n";
+				cout << m2d(D.x) << "\n\n\n";
 
 				return Xopt;
 			}
 
 			Xopt.ud.add_row((B.x - A.x)());
 
+
 			if (B.x - A.x < epsilon || abs(D.x() - D_old.x()) < gamma)
 			{
-				A.fit_fun(ff1T, ud1, ud2);
-				B.fit_fun(ff1T, ud1, ud2);
-				C.fit_fun(ff1T, ud1, ud2);
+				A.fit_fun(fun1, ud1, ud2);
+				B.fit_fun(fun1, ud1, ud2);
+				C.fit_fun(fun1, ud1, ud2);
 
 				Xopt = D;
 				Xopt.flag = 0;
+
+				cout << abs(m2d(B.x)) << " " << abs(m2d(A.x)) << "\n";
+				cout << abs(m2d(B.x) - m2d(A.x)) << "\n";
+				cout << m2d(D.x) << "\n\n\n";
+
 				break;
 			}
 			if (solution::f_calls > Nmax)
 			{
 
-				A.fit_fun(ff1T, ud1, ud2);
-				B.fit_fun(ff1T, ud1, ud2);
-				C.fit_fun(ff1T, ud1, ud2);
+				A.fit_fun(fun1, ud1, ud2);
+				B.fit_fun(fun1, ud1, ud2);
+				C.fit_fun(fun1, ud1, ud2);
 
 				Xopt = D;
 				Xopt.flag = 1;
 				break;
 			}
-			A.fit_fun(ff1T, ud1, ud2);
-			B.fit_fun(ff1T, ud1, ud2);
-			C.fit_fun(ff1T, ud1, ud2);
-
+			A.fit_fun(fun1, ud1, ud2);
+			B.fit_fun(fun1, ud1, ud2);
+			C.fit_fun(fun1, ud1, ud2);
 			D_old = D;
+
+			cout << abs(m2d(B.x)) << " " << abs(m2d(A.x)) << "\n";
+			cout << abs(m2d(B.x) - m2d(A.x)) << "\n";
+			cout << m2d(D.x) << "\n\n\n";
+
 		}
-		A.fit_fun(ff1T, ud1, ud2);
-		B.fit_fun(ff1T, ud1, ud2);
-		C.fit_fun(ff1T, ud1, ud2);
+		A.fit_fun(fun1, ud1, ud2);
+		B.fit_fun(fun1, ud1, ud2);
+		C.fit_fun(fun1, ud1, ud2);
+
+		cout << abs(m2d(B.x)) << " " << abs(m2d(A.x)) << "\n";
+		cout << abs(m2d(B.x) - m2d(A.x)) << "\n";
+		cout << m2d(D.x) << "\n\n\n";
 
 		return Xopt;
 
@@ -231,18 +261,19 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 		XB.fit_fun(ff, ud1, ud2);
 		while (true)
 		{
-
+			
 			X = HJ_trial(ff, XB, s, ud1, ud2);
-			//cout << X.x(0) << " " << X.x(1) << endl;
+			//std::cout << X.x(0) << " " << X.x(1) << std::endl;
 			if (X.y < XB.y)
 			{
 				while (true)
 				{
+
 					XB_old = XB;
 					XB = X;
 					X.x = XB.x + XB.x - XB_old.x;
-
 					X.fit_fun(ff, ud1, ud2);
+					//std::cout << m2d(X.y) << std::endl;
 					X = HJ_trial(ff, X, s, ud1, ud2);
 					if (X.y >= XB.y)
 						break;
@@ -272,12 +303,14 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 		for (int i = 0; i < n; i++) {
 			X.x = XB.x + s * d[i];
 			X.fit_fun(ff, ud1, ud2);
+			//std::cout << m2d(X.y) << std::endl;
 			if (X.y < XB.y) {
 				XB = X;
 			}
 			else {
 				X.x = XB.x - s * d[i];
 				X.fit_fun(ff, ud1, ud2);
+				//std::cout << m2d(X.y) << std::endl;
 				if (X.y < XB.y) {
 					XB = X;
 				}
@@ -293,16 +326,14 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 		throw ("solution HJ_trial(...):\n" + ex_info);
 	}
 }
-//punkt startowy x(0), wektor długość kroków s(0), współczynnik ekspansji α > 1,
-//współczynnik kontrakcji 0 < β < 1, dokładność ε > 0, maksymalna liczba wywołań funkcji celu Nmax
-//macierze Q i D odpowiadają obrotowi bazy
+
 solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix dlugosc_kroku, double alpha, double beta, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
 	{
 
 		bool running = true;//zmienna do kończenia pętli głównej funkcji
-		solution Xopt, X;//przyszły wynik
+		solution Xopt;
 		int n = get_dim(wspolrzedne);//zbierać wymiar przestrzeni
 		matrix poczatkowe_wspolrzedne = wspolrzedne;
 		matrix preNowaBaza(n, n, 0.0);
@@ -310,7 +341,6 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix d
 		matrix kierunek(n, n, 0.0);
 		matrix roznica_poczatku_baz(n, n, 0.0);
 
-		//ustalenie początkowej bazy poszukiwań
 		kierunek(0, 0) = 1;
 		kierunek(1, 1) = 1;
 		double x_roznica, y_roznica;
@@ -321,17 +351,17 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix d
 		double dl_kroku;
 		cout << kierunek << endl << endl;
 		do {
-			Xopt.f_calls++;
 			for (int j = 0; j < n; j++)
 			{
+				Xopt.f_calls++;
 				nowe_wspolrzedne = wspolrzedne;
 				nowe_wspolrzedne(0) += (dlugosc_kroku(j, 0) * kierunek(0, 0) + dlugosc_kroku(j, 1) * kierunek(1, 0));
 				nowe_wspolrzedne(1) += (dlugosc_kroku(j, 0) * kierunek(0, 1) + dlugosc_kroku(j, 1) * kierunek(1, 1));
+				//std::cout << m2d(nowe_wspolrzedne(0)) << std::endl;
 				// zapisane [x]
 				//			[y]
 
-				//kierunek nie musi być zgodny z osiami
-				if (ff(wspolrzedne, ud1, ud2) > ff(nowe_wspolrzedne, ud1, ud2))
+				if ((*ff)(wspolrzedne, ud1, ud2) > (*ff)(nowe_wspolrzedne, ud1, ud2)) //kierunek nie musi być zgodny z osiami
 				{
 					wspolrzedne = nowe_wspolrzedne;
 					lambda(j)++;
@@ -346,14 +376,14 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix d
 				}
 
 			}
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////			
 
 			i++;
-			//zmiana bazy
 			if (porazki(0) * porazki(1) * lambda(0) * lambda(1))
 			{
 				matrix wektor1(n, 1, 0.0);
 				matrix wektor2(n, 1, 0.0);
-
+				//zmiana bazy dopisać
 				x_roznica = poczatkowe_wspolrzedne(0) - wspolrzedne(0);
 				y_roznica = poczatkowe_wspolrzedne(1) - wspolrzedne(1);
 				poczatkowe_wspolrzedne = wspolrzedne;
@@ -393,10 +423,10 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix d
 				porazki(0) = 0;
 				porazki(1) = 0;
 			}
-			//warunek przekroczenia maksymalnej ilości iteracji
+
 			if (i >= Nmax)	break;
 			dl_kroku = sqrt(dlugosc_kroku(0, 0) * dlugosc_kroku(0, 0) + dlugosc_kroku(0, 1) * dlugosc_kroku(0, 1));
-			//warunek przekroczenia minimalnej długości kroku
+			//cout << dl_kroku << endl;
 			if (dl_kroku < epsilon)
 			{
 				Xopt.flag = 0;
@@ -406,8 +436,7 @@ solution Rosen(matrix(*ff)(matrix, matrix, matrix), matrix wspolrzedne, matrix d
 		} while (running);//trzeba badać wartości bezwzględne bo krok może być ujemny
 		//return x * = x(i)		Xopt?
 		Xopt = wspolrzedne;
-		Xopt.y = ff(wspolrzedne, ud1, ud2);
-		Xopt.flag = 0;
+		Xopt.y = (*ff)(wspolrzedne, ud1, ud2);
 		return Xopt;
 
 	}
@@ -436,10 +465,114 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		int n = get_len(x0);
+		matrix D = ident_mat(n);
+		matrix Ss;
+		double N = n + 1;
+		solution* S = new solution[N];
+
+
+
+		S[0].x = x0;
+		S[0].fit_fun(ff, ud1, ud2);
+
+		for (int i = 1; i < N; i++)
+		{
+			S[i].x = S[0].x + s * D[i - 1];
+			S[i].fit_fun(ff, ud1, ud2);
+		}
+
+		int imin = 0;
+		int imax = 0;
+
+		solution po, pe, pz;
+
+		while (true)
+		{
+			for (int i = 1; i < N; i++)
+			{
+				if (S[i].y < S[imin].y)
+				{
+					imin = i;
+				}
+				if (S[i].y > S[imax].y)
+				{
+					imax = i;
+				}
+			}
+
+			Ss = matrix(n, 1);
+			for (int i = 0; i < N; ++i)
+			{
+				if (i != imax)
+				{
+					Ss = Ss + S[i].x;
+				}
+			}
+
+			Ss = Ss / N - 1;
+
+			po.x = Ss + alpha * (Ss - S[imax].x);
+			po.fit_fun(ff, ud1, ud2);
+
+			if (S[imin].y <= po.y && po.y < S[imax].y)
+			{
+				S[imax] = po;
+			}
+
+			else if (po.y < S[imin].y)
+			{
+				pe = Ss + gamma * (po.x - Ss);
+				pe.fit_fun(ff, ud1, ud2);
+
+				if (pe.y >= po.y)
+				{
+					S[imax] = po.x;
+					S[imax].fit_fun(ff, ud1, ud2);
+				}
+				else
+				{
+					S[imax] = pe.x;
+					S[imax].fit_fun(ff, ud1, ud2);
+				}
+			}
+			else
+			{
+				pz.x = Ss + beta * (S[imax].x - Ss);
+				pz.fit_fun(ff, ud1, ud2);
+
+				if (pz.y >= S[imax].y)
+				{
+					for (int i = 0; i < N; ++i)
+					{
+						if (i != imin)
+						{
+							S[i].x = delta * (S[i].x + S[imin].x);
+							S[i].fit_fun(ff, ud1, ud2);
+						}
+					}
+				}
+				else
+				{
+					S[imax] = pz;
+				}
+			}
+
+			double max_s = norm(S[0].x - S[imin].x);
+			for (int i = 1; i < N; ++i)
+				if (max_s < norm(S[i].x - S[imin].x))
+					max_s = norm(S[i].x - S[imin].x);
+
+			if (solution::f_calls > Nmax || max_s < epsilon)
+			{
+				Xopt = S[imin];
+				return Xopt;
+			}
+		}
 
 		return Xopt;
 	}
+
 	catch (string ex_info)
 	{
 		throw ("solution sym_NM(...):\n" + ex_info);
@@ -535,4 +668,24 @@ solution EA(matrix(*ff)(matrix, matrix, matrix), int N, matrix limits, int mi, i
 	{
 		throw ("solution EA(...):\n" + ex_info);
 	}
+}
+
+matrix iloczyn_macierzy(matrix A, matrix B, int wiersz_a, int kolumny_a, int wiersz_b, int kolumny_b)
+{
+	if (kolumny_a != wiersz_b)
+	{
+		cout << "Bledne rozmiary macierzy" << endl;
+		cerr << "ERROR:\n";
+
+	}
+	//cout << "Iloczyn macierzy: " << endl;
+	//cout << A << endl << endl << B << endl << endl;
+	matrix C(wiersz_a, kolumny_b, 0.0);
+	for (int i = 0; i < wiersz_a; i++)
+		for (int j = 0; j < kolumny_b; j++)
+			for (int k = 0; k < wiersz_b; k++)
+				C(i, j) += A(i, k) * B(k, j);
+
+	//cout << "=" << endl << C << endl << endl << endl;
+	return C;
 }

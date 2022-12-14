@@ -1,5 +1,2 @@
-﻿  main.cpp
-C:\Users\Szef\Desktop\Nauka\Sem 5\kopia\Optymalizacja\main.cpp(53,12): warning C4244: "argument": konwersja z "time_t" do "unsigned int", możliwa utrata danych
-C:\Users\Szef\Desktop\Nauka\Sem 5\kopia\Optymalizacja\main.cpp(33,9): warning C4101: "tab2": lokalna zmienna, do której nie istnieje odwołanie
-C:\Users\Szef\Desktop\Nauka\Sem 5\kopia\Optymalizacja\main.cpp(34,9): warning C4101: "tab3": lokalna zmienna, do której nie istnieje odwołanie
-  Project.vcxproj -> C:\Users\Szef\Desktop\Nauka\Sem 5\kopia\Optymalizacja\x64\Debug\Project.exe
+﻿  ode_solver.cpp
+  Project.vcxproj -> C:\Users\Szef\Desktop\Nauka\Sem 5\Optymalizacja\x64\Debug\Project.exe
