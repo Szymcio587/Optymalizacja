@@ -226,47 +226,35 @@ solution HJ(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double alp
 {
 	try
 	{
-		solution Xopt;
-		//Xopt.XB
-		solution X, XB, XBold;
-		X = x0;
+		solution XB, XB_old, X;
+		XB.x = x0;
+		XB.fit_fun(ff, ud1, ud2);
+		while (true)
+		{
 
-		while (true) {
-			XB = X;
 			X = HJ_trial(ff, XB, s, ud1, ud2);
-			X.fit_fun(ff, ud1, ud2);
-			XB.fit_fun(ff, ud1, ud2);
-
-			if (X.y < XB.y) {
-
-				while (true) {
-					XBold = XB;
+			//cout << X.x(0) << " " << X.x(1) << endl;
+			if (X.y < XB.y)
+			{
+				while (true)
+				{
+					XB_old = XB;
 					XB = X;
-					X.x = 2 * XB.x - XBold.x;
-					X = HJ_trial(ff, XB, s, ud1, ud2);
-					if (solution::f_calls > Nmax) {
-						return -1;
-					}
+					X.x = XB.x + XB.x - XB_old.x;
+
 					X.fit_fun(ff, ud1, ud2);
-					XB.fit_fun(ff, ud1, ud2);
+					X = HJ_trial(ff, X, s, ud1, ud2);
 					if (X.y >= XB.y)
 						break;
+					if (XB.f_calls > Nmax)
+						return XB;
 				}
-				X = XB;
-
 			}
-			else {
-				s = alpha * s;
-			}
-			if (solution::f_calls > Nmax) {
-				return -1;
-			}
-			if (s < epsilon) {
-				break;
-			}
+			else
+				s *= alpha;
+			if (XB.f_calls > Nmax || s < epsilon)
+				return XB;
 		}
-		Xopt = XB;
-		return Xopt;
 	}
 	catch (string ex_info)
 	{
@@ -279,23 +267,23 @@ solution HJ_trial(matrix(*ff)(matrix, matrix, matrix), solution XB, double s, ma
 	try
 	{
 		int n = get_dim(XB);
-		matrix E = ident_mat(n);
 		solution X;
-
-		for (int j = 0; j < n; j++) {
-			X.x = XB.x + s * E[j];
+		matrix d = ident_mat(n);
+		for (int i = 0; i < n; i++) {
+			X.x = XB.x + s * d[i];
 			X.fit_fun(ff, ud1, ud2);
-			XB.fit_fun(ff, ud1, ud2);
 			if (X.y < XB.y) {
-				XB.x = XB.x + s * E[j];
+				XB = X;
 			}
 			else {
-				X.x = XB.x - s * E[j];
+				X.x = XB.x - s * d[i];
 				X.fit_fun(ff, ud1, ud2);
 				if (X.y < XB.y) {
-					XB.x = XB.x - s * E[j];
+					XB = X;
 				}
+
 			}
+
 		}
 		return XB;
 	}
@@ -448,7 +436,110 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		int n = get_len(x0);
+		matrix D = ident_mat(n);
+		matrix Ss;
+		double N = n + 1;
+		solution* S = new solution[N];
+
+
+
+		S[0].x = x0;
+		S[0].fit_fun(ff, ud1, ud2);
+
+		for (int i = 1; i < N; i++)
+		{
+			S[i].x = S[0].x + s * D[i - 1];
+			S[i].fit_fun(ff, ud1, ud2);
+		}
+
+		int imin = 0;
+		int imax = 0;
+
+		solution po, pe, pz;
+
+		while (true)
+		{
+			for (int i = 1; i < N; i++)
+			{
+				if (S[i].y < S[imin].y)
+				{
+					imin = i;
+				}
+				if (S[i].y > S[imax].y)
+				{
+					imax = i;
+				}
+			}
+
+			Ss = matrix(n, 1);
+			for (int i = 0; i < N; ++i)
+			{
+				if (i != imax)
+				{
+					Ss = Ss + S[i].x;
+				}
+			}
+
+			Ss = Ss / N - 1;
+
+			po.x = Ss + alpha * (Ss - S[imax].x);
+			po.fit_fun(ff, ud1, ud2);
+
+			if (S[imin].y <= po.y && po.y < S[imax].y)
+			{
+				S[imax] = po;
+			}
+
+			else if (po.y < S[imin].y)
+			{
+				pe = Ss + gamma * (po.x - Ss);
+				pe.fit_fun(ff, ud1, ud2);
+
+				if (pe.y >= po.y)
+				{
+					S[imax] = po.x;
+					S[imax].fit_fun(ff, ud1, ud2);
+				}
+				else
+				{
+					S[imax] = pe.x;
+					S[imax].fit_fun(ff, ud1, ud2);
+				}
+			}
+			else
+			{
+				pz.x = Ss + beta * (S[imax].x - Ss);
+				pz.fit_fun(ff, ud1, ud2);
+
+				if (pz.y >= S[imax].y)
+				{
+					for (int i = 0; i < N; ++i)
+					{
+						if (i != imin)
+						{
+							S[i].x = delta * (S[i].x + S[imin].x);
+							S[i].fit_fun(ff, ud1, ud2);
+						}
+					}
+				}
+				else
+				{
+					S[imax] = pz;
+				}
+			}
+
+			double max_s = norm(S[0].x - S[imin].x);
+			for (int i = 1; i < N; ++i)
+				if (max_s < norm(S[i].x - S[imin].x))
+					max_s = norm(S[i].x - S[imin].x);
+
+			if (solution::f_calls > Nmax || max_s < epsilon)
+			{
+				Xopt = S[imin];
+				return Xopt;
+			}
+		}
 
 		return Xopt;
 	}

@@ -154,7 +154,7 @@ void lab1()
 
 void lab2()
 {
-
+	///    Od Jaœka////////////////////////////////////////////////////////////////////////////////
 	double s = 0.5;//zmienna okreœlaj¹ca d³ugoœæ kroku
 	matrix ss(2, 2, s);// matrix d³ugoœci kroku
 	ss(1, 0) = 0;
@@ -164,8 +164,13 @@ void lab2()
 	double alphaHJ = 0.5;
 	double alphaR = 2;
 	double beta = 0.5;
-	double epsilon = 0.001;
-	int Nmax = 100;
+	double epsilon = 0.00000001;
+	int Nmax = 1000;
+
+	//matrix x0hj(2, 1, 0.75);
+	//solution sol1 = HJ(ff2T, x0hj, s, alphaHJ, epsilon, Nmax, NULL, NULL);
+	//cout << sol1 << endl;
+	//solution::clear_calls();
 
 	matrix ud1(10, 1, 0.0);//ud1 jako wektor 10x1 o wartoœciach 0
 	ud1(0, 0) = 0.5;//d³ugoœæ ramienia robota
@@ -173,7 +178,7 @@ void lab2()
 	ud1(2, 0) = 9;//masa ciêzarka
 	ud1(3, 0) = 3.14;//k¹t obrotu koñcowy:    pi rad
 	//moment bezw³adnoœci
-	//ciê¿arek jest traktowany jako punkt na koñcu ramienia
+	////ciê¿arek jest traktowany jako punkt na koñcu ramienia
 	ud1(4, 0) = ((1 / 3) * ud1(1, 0) * pow((ud1(0, 0)), 2)) + ud1(2, 0) * pow(ud1(0, 0), 2);
 	ud1(5, 0) = 0.5;//wspó³czynnik tarcia
 	ud1(6, 0) = 0.1;//krok czasowy
@@ -188,29 +193,43 @@ void lab2()
 	//x0.x i x0.y powinny byæ z przedzia³u [0,10]
 	matrix x0(2, 1, 0.75);
 
-	//solution sol1 = HJ(ff2T, x0, s, alphaHJ, epsilon, Nmax, NULL, NULL);
-	//cout << sol1 << endl;
-	//solution::clear_calls();
+
+	solution sol1 = HJ(ff2R, x0, s, alphaHJ, epsilon, Nmax, ud1, ud2);
+	cout << sol1 << endl;
+	solution::clear_calls();
+
+	solution sol2 = Rosen(ff2R, x0, ss, alphaR, beta, epsilon, Nmax, ud1, ud2);
+	cout << sol2 << endl;
 
 	//funkcja zwraca solution, przyjmuje:
 	//wskaŸnik do funkcji zwracaj¹cej matrix, matrix wspolrzedne (pocz¹tkowe), matrix dlugosc_kroku, 
 	//double alpha, double beta, double epsilon, int Nmax, matrix ud1, matrix ud2
 	//solution sol2 = Rosen(ff2T, x0, ss, alphaR, beta, epsilon, Nmax, ud1, ud2);
-	solution sol2 = Rosen(ff2R, x0, ss, alphaR, beta, epsilon, Nmax, ud1, ud2);
-	cout << sol2 << endl;
 
-	matrix* Z = solve_ode(df2, 0, 1, 1000, ud2, ud1, ud2);
-	cout << Z[1](0) << "\n";
-	cout << Z[1](1) << "\n";
-	cout << Z[1](2) << "\n";
-	cout << Z[1](3) << "\n";
+	//solution sol2 = Rosen(ff2R, x0, ss, alphaR, beta, epsilon, Nmax, ud1, ud2);
+	//cout << sol2 << endl;
 
-	cout << sol2.y << "\n";
+	//matrix* Z = solve_ode(df2, 0, 1, 1000, ud2, ud1, ud2);
+	//cout << Z[1](0) << "\n";
+	//cout << Z[1](1) << "\n";
+	//cout << Z[1](2) << "\n";
+	//cout << Z[1](3) << "\n";
+
+	//cout << sol2.y << "\n";
 	
 }
 
 void lab3()
 {
+	//matrix x0(2, 1, -2.0);
+	//x0(0, 0) = -3;
+	//matrix z = ff3T(x0);
+	//cout << z;
+
+	matrix x0(3, 3, 0.0);
+	double alpha = 1.0, beta = 0.5, gamma = 0.5, delta = 0.5, epsilon = 0.0001;
+	int s = 3, Nmax = 1000;
+	sym_NM(ff3T, x0, s, alpha, beta, gamma, delta, epsilon, Nmax);
 
 }
 

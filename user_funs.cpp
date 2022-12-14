@@ -142,3 +142,71 @@ matrix df2(double t, matrix Y, matrix ud1, matrix ud2)
 		throw ("df2* sie wywalil(...):\n" + ex_info);
 	}
 }
+
+
+matrix ff3T(matrix x1, matrix ud1, matrix ud2)
+{
+	matrix y;
+	y = pow(x1(0), 2) + pow(x1(1), 2) - cos(2.5 * 3.14 * x1(0)) - cos(2.5 * 3.14 * x1(1)) + 2;
+
+	return y;
+}
+
+/* find the index of the largest value */
+int vg_index(matrix f, int vg, int n)
+{
+	int j;
+
+	for (j = 0; j <= n; j++)
+	{
+		if (f(j) > f(vg))
+			vg = j;
+	}
+	return vg;
+}
+
+
+/* find the index of the smallest value */
+int vs_index(matrix f, int vs, int n)
+{
+	int j;
+
+	for (j = 0; j <= n; j++)
+	{
+		if (f(j) < f(vs))
+			vs = j;
+	}
+	return vs;
+}
+
+
+/* find the index of the second largest value */
+int vh_index(matrix f, int vh, int vg, int n)
+{
+	int j;
+
+	for (j = 0; j <= n; j++)
+	{
+		if (f(j) > f(vh) && f(j) < f(vg))
+			vh = j;
+	}
+	return vh;
+}
+
+
+/* calculate the centroid */
+void centroid(matrix vm, matrix v, int n, int vg)
+{
+	int j, m;
+	double cent;
+
+	for (j = 0; j <= n - 1; j++) {
+		cent = 0.0;
+		for (m = 0; m <= n; m++) {
+			if (m != vg) {
+				cent += v(m, j);
+			}
+		}
+		vm(j) = cent / n;
+	}
+}
