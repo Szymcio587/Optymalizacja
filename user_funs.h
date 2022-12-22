@@ -22,3 +22,6 @@ int vs_index(matrix f, int vs, int n);
 int vh_index(matrix f, int vh, int vg, int n);
 /* calculate the centroid */
 void centroid(matrix vm, matrix v, int n, int vg);
+
+matrix df3(double t, matrix Y, matrix ud1, matrix ud2);
+matrix ff3R(matrix X, matrix ud1, matrix ud2);

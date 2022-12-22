@@ -421,7 +421,17 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc
 {
 	try {
 		solution Xopt;
-		//Tu wpisz kod funkcji
+
+		double alpha = 1, beta = 0.5, gamma = 2, delta = 0.5, s = 0.5;
+		solution X(x0), X1;
+		while (true)
+		{
+			X1 = sym_NM(ff, X.x, s, alpha, beta, gamma, delta, epsilon, Nmax, ud1, c);
+			if (norm(X.x - X1.x) < epsilon || solution::f_calls > Nmax)
+				return X1;
+			c *= dc;
+			X = X1;
+		}
 
 		return Xopt;
 	}
@@ -594,13 +604,30 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 		throw ("solution Newton(...):\n" + ex_info);
 	}
 }
-
-solution golden(matrix(*ff)(matrix, matrix, matrix), double a, double b, double epsilon, int Nmax, matrix ud1, matrix ud2)
+//input: 
+//pointer do funkcji
+//przedział poszukiwań [a, b]
+//dokładność obliczeń epsilon
+//maksymalna ilość iteracji
+//ud1,ud2
+solution golden(matrix(*ff)(matrix, matrix, matrix), double a0, double b0, double epsilon, int Nmax, matrix ud1, matrix ud2)
 {
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		//int i = 0;//tak w instrukcji było
+		//double alpha = (pow(5, 0.5) - 1) / 2;
+		//double a = a0;
+		//double b = b0;
+		//double c = b - alpha * (b - a);
+		//double d = a + alpha * (b - a);
+		//matrix x(2, 1, 0);
+
+		//while(true) {
+		//	
+
+		//}
+
 
 		return Xopt;
 	}

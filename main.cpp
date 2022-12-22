@@ -15,7 +15,7 @@ int main()
 {
 	try
 	{
-		lab2();
+		lab3();
 		std::cout << "\nskonczylo program\n";
 	}
 	catch (string EX_INFO)
@@ -154,7 +154,6 @@ void lab1()
 
 void lab2()
 {
-	///    Od Jaœka////////////////////////////////////////////////////////////////////////////////
 	double s = 0.5;//zmienna okreœlaj¹ca d³ugoœæ kroku
 	matrix ss(2, 2, s);// matrix d³ugoœci kroku
 	ss(1, 0) = 0;
@@ -226,10 +225,12 @@ void lab3()
 	//matrix z = ff3T(x0);
 	//cout << z;
 
-	matrix x0(3, 3, 0.0);
+	matrix x0(2, 1, 0.0);
 	double alpha = 1.0, beta = 0.5, gamma = 0.5, delta = 0.5, epsilon = 0.0001;
-	int s = 3, Nmax = 1000;
-	sym_NM(ff3T, x0, s, alpha, beta, gamma, delta, epsilon, Nmax);
+	int s = 3, Nmax = 100;
+	solution sol = sym_NM(ff3R, x0, s, alpha, beta, gamma, delta, epsilon, Nmax);
+
+	std::cout << sol;
 
 }
 
