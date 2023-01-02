@@ -16,7 +16,7 @@ int main()
 {
 	try
 	{
-		lab2();
+		lab3();
 	}
 	catch (string EX_INFO)
 	{
@@ -140,15 +140,57 @@ void lab2()
 
 void lab3()
 {
-//matrix x0(2, 1, -2.0);
-//x0(0, 0) = -3;
-//matrix z = ff3T(x0);
-//cout << z;
+	//matrix x0(2, 1, -2.0);
+	//x0(0, 0) = -3;
+	//matrix z = ff3T(x0);
+	//cout << z;
 
-	matrix x0(3, 3, 0.0);
-	double alpha = 1.0, beta = 0.5, gamma = 0.5, delta = 0.5, epsilon = 0.0001;
-	int s = 3, Nmax = 1000;
-	sym_NM(ff3T, x0, s, alpha, beta, gamma, delta, epsilon, Nmax);
+	matrix x0(2, 1, 0.0);
+	double alpha = 4.0, beta = 0.5, gamma = 0.5, delta = 0.5, epsilon = 0.0001;
+	int s = 3, Nmax = 100;
+	solution sol = sym_NM(ff3R, x0, s, alpha, beta, gamma, delta, epsilon, Nmax);
+	//std::cout << sol;
+
+	//srand(time(NULL));
+	//lxw_workbook* workbook = workbook_new("Cwiczenia_3.xlsx");
+	//lxw_worksheet* worksheet = workbook_add_worksheet(workbook, "Tabela 1");
+	//matrix x0[100];
+	//double X[2];
+	//matrix ss(2, 2, s);
+	//ss(1, 0) = 0;
+	//ss(0, 1) = 0;
+	//	for (int j = 0; j < 1; j++) {
+	//		for (int i = 0; i < 100; i++)
+	//		{
+	//			X[0] = (double) rand() / RAND_MAX * 10;
+	//			X[1] = (double) rand() / RAND_MAX * 10;
+	//			//X[0] = 1;
+	//			//X[1] = 1;
+	//			x0[i] = matrix(2, X);
+	//			//cout << x0[i] << endl;
+	//			worksheet_write_number(worksheet, 100 * j + i + 1, 1, X[0], NULL);
+	//			worksheet_write_number(worksheet, 100 * j + i + 1, 2, X[1], NULL);
+	//			beta = 0.5, gamma = 0.5, delta = 0.5, epsilon = 0.01;
+	//			solution sol1 = sym_NM(ff3R, x0[i], s, alpha, beta, gamma, delta, epsilon, Nmax);
+	//			cout << sol1 << endl;
+	//			worksheet_write_number(worksheet, 100 * j + i + 1, 3, m2d(sol1.x(0, 0)), NULL);
+	//			worksheet_write_number(worksheet, 100 * j + i + 1, 4, m2d(sol1.x(1, 0)), NULL);
+	//			worksheet_write_number(worksheet, 100 * j + i + 1, 5, pow(pow(m2d(sol1.x(0, 0)), 2) + pow(m2d(sol1.y), 2), 0.5), NULL);
+	//			worksheet_write_number(worksheet, 100 * j + i + 1, 6, m2d(sol1.y), NULL);
+	//			worksheet_write_number(worksheet, 100 * j + i + 1, 7, sol1.f_calls, NULL);
+	//			sol1.clear_calls();
+	//			beta = 0.1, gamma = 0.1, delta = 0.1, epsilon = 0.0001;
+	//			solution sol2 = sym_NM(ff3R, x0[i], s, alpha, beta, gamma, delta, epsilon, Nmax);
+	//			cout << sol2 << endl;
+	//			worksheet_write_number(worksheet, 100 * j + i + 1, 8, m2d(sol2.x(0, 0)), NULL);
+	//			worksheet_write_number(worksheet, 100 * j + i + 1, 9, m2d(sol2.x(1, 0)), NULL);
+	//			worksheet_write_number(worksheet, 100 * j + i + 1, 10, pow(pow(m2d(sol2.x(0, 0)), 2) + pow(m2d(sol2.y), 2), 0.5), NULL);
+	//			worksheet_write_number(worksheet, 100 * j + i + 1, 11, m2d(sol2.y), NULL);
+	//			worksheet_write_number(worksheet, 100 * j + i + 1, 12, sol2.f_calls, NULL);
+	//			sol2.clear_calls();
+	//		}
+	//	}
+	//workbook_close(workbook);
 }
 
 void lab4()

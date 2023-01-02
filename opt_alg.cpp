@@ -450,7 +450,17 @@ solution pen(matrix(*ff)(matrix, matrix, matrix), matrix x0, double c, double dc
 {
 	try {
 		solution Xopt;
-		//Tu wpisz kod funkcji
+
+		double alpha = 1, beta = 0.5, gamma = 2, delta = 0.5, s = 0.5;
+		solution X(x0), X1;
+		while (true)
+		{
+			X1 = sym_NM(ff, X.x, s, alpha, beta, gamma, delta, epsilon, Nmax, ud1, c);
+			if (norm(X.x - X1.x) < epsilon || solution::f_calls > Nmax)
+				return X1;
+			c *= dc;
+			X = X1;
+		}
 
 		return Xopt;
 	}
@@ -475,7 +485,6 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 
 		S[0].x = x0;
 		S[0].fit_fun(ff, ud1, ud2);
-
 		for (int i = 1; i < N; i++)
 		{
 			S[i].x = S[0].x + s * D[i - 1];
@@ -514,6 +523,7 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 
 			po.x = Ss + alpha * (Ss - S[imax].x);
 			po.fit_fun(ff, ud1, ud2);
+			//std::cout << po << std::endl;
 
 			if (S[imin].y <= po.y && po.y < S[imax].y)
 			{
@@ -524,22 +534,26 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 			{
 				pe = Ss + gamma * (po.x - Ss);
 				pe.fit_fun(ff, ud1, ud2);
+				//std::cout << pe << std::endl;
 
 				if (pe.y >= po.y)
 				{
 					S[imax] = po.x;
 					S[imax].fit_fun(ff, ud1, ud2);
+					//std::cout << *S << std::endl;
 				}
 				else
 				{
 					S[imax] = pe.x;
 					S[imax].fit_fun(ff, ud1, ud2);
+					//std::cout << *S << std::endl;
 				}
 			}
 			else
 			{
 				pz.x = Ss + beta * (S[imax].x - Ss);
 				pz.fit_fun(ff, ud1, ud2);
+				//std::cout << pz << std::endl;
 
 				if (pz.y >= S[imax].y)
 				{
@@ -549,6 +563,7 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 						{
 							S[i].x = delta * (S[i].x + S[imin].x);
 							S[i].fit_fun(ff, ud1, ud2);
+							//std::cout << *S << std::endl;
 						}
 					}
 				}
@@ -572,7 +587,6 @@ solution sym_NM(matrix(*ff)(matrix, matrix, matrix), matrix x0, double s, double
 
 		return Xopt;
 	}
-
 	catch (string ex_info)
 	{
 		throw ("solution sym_NM(...):\n" + ex_info);

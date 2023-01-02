@@ -118,11 +118,10 @@ matrix df2(double t, matrix Y, matrix ud1, matrix ud2)
     }
 }
 
-matrix ff3T(matrix x1, matrix ud1, matrix ud2)
+matrix ff3T(matrix x, matrix ud1, matrix ud2)
 {
     matrix y;
-    y = pow(x1(0), 2) + pow(x1(1), 2) - cos(2.5 * 3.14 * x1(0)) - cos(2.5 * 3.14 * x1(1)) + 2;
-
+    y = sin(M_PI * pow(pow(x(0)/M_PI, 2) + pow(x(1)/M_PI, 2), 0.5)) / (M_PI * pow(pow(x(0) / M_PI, 2) + pow(x(1) / M_PI, 2), 0.5));
     return y;
 }
 
@@ -180,5 +179,49 @@ void centroid(matrix vm, matrix v, int n, int vg)
         }
         vm(j) = cent / n;
     }
+}
+
+matrix df3(double t, matrix Y, matrix ud1, matrix ud2) {
+    double c = 0.47, r = 0.12, m = 0.6, r0 = 1.2, g = 9.81;
+    double S = 3.14 * r * r, w = ud2(0);
+    double Dx = 0.5 * c * r0 * S * Y(1) * abs(Y(1));
+    double Dy = 0.5 * c * r0 * S * Y(3) * abs(Y(3));
+    double FMx = r0 * Y(3) * w * 3.14 * pow(r, 3);
+    double FMy = r0 * Y(1) * w * 3.14 * pow(r, 3);
+
+    matrix dY(4, 1);
+
+    dY(0) = Y(1);
+    dY(1) = (-Dx - FMx) / m;
+    dY(2) = Y(3);
+    dY(3) = (-m * g - Dy - FMy) / m;
+    return dY;
+}
+
+matrix ff3R(matrix X, matrix ud1, matrix ud2) {
+
+    matrix y;
+    matrix Y0 = matrix(4, new double[4] {0, X(0), 100, 0});
+    matrix* Y = solve_ode(df3, 0, 0.01, 7, Y0, ud1, X(1));
+
+
+    int n = get_len(Y[0]);
+    int i50 = 0, i0 = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (abs(Y[1](i, 2) - 50) < abs(Y[1](i50, 2) - 50))
+            i50 = i;
+        if (abs(Y[1](i, 2)) < abs(Y[1](i0, 2)))
+            i0 = i;
+        y = -Y[1](i0, 0);
+        if (abs(X(0)) - 10 > 0)
+            y = y + ud2 * pow(abs(X(0)) - 10, 2);
+        if (abs(X(1)) - 25 > 0)
+            y = y + ud2 * pow(abs(X(1)) - 25, 2);
+        if (abs(Y[1](i50, 0) - 5) - 1 > 0)
+            y = y + pow(abs(Y[1](i50, 0) - 5) - 1, 2);
+    }
+
+    return y;
 }
 
