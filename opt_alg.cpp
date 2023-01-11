@@ -564,7 +564,34 @@ solution SD(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix, mat
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		int n = get_len(x0);
+		solution X0, X1;
+		X0.x = x0;
+		matrix d(n, 1), p(n, 2);
+		solution h; //krok 
+		double* ab;
+
+		while (true) {
+			d = -X0.grad(gf, ud1, ud2);
+			if (h0 < 0) {
+				p.set_col(X0.x, 0);
+				p.set_col(d, 1);
+				ab = expansion(ff, 0, 1, 1.2, Nmax, ud1, p);
+				h = golden(ff, ab[0], ab[1], epsilon, Nmax, ud1, p);
+				X1.x = X0.x + h.x * d;
+			}
+
+			X1.x = X0.x + h0 * d;
+			if (norm(X0.x - X1.x) < epsilon) {
+				Xopt = X1;
+				break;
+			}
+
+			if (solution::f_calls > Nmax || solution::g_calls > Nmax)
+				break;
+
+			X0 = X1;
+		}
 
 		return Xopt;
 	}
@@ -595,8 +622,31 @@ solution Newton(matrix(*ff)(matrix, matrix, matrix), matrix(*gf)(matrix, matrix,
 	try
 	{
 		solution Xopt;
-		//Tu wpisz kod funkcji
+		int n = get_len(x0);
+		solution X0, X1;
+		X0.x = x0;
+		matrix d(n, 1), p(n, 2);
+		solution h; //krok 
+		double* ab;
 
+		while (true) {
+			d = -inv(X0.hess(gf, ud1, ud2)) * X0.x * X0.grad(gf, ud1, ud2);
+			if (h0 < 0) {
+				p.set_col(X0.x, 0);
+				p.set_col(d, 1);
+				ab = expansion(ff, 0, 1, 1.2, Nmax, ud1, p);
+				h = golden(ff, ab[0], ab[1], epsilon, Nmax, ud1, p);
+				X1.x = X0.x + h.x * d;
+			}
+			X1.x = X0.x + h0 * d;
+			if (norm(X0.x - X1.x) < epsilon) {
+				Xopt = X1;
+				break;
+			}
+			if (solution::f_calls > Nmax || solution::g_calls > Nmax)
+				break;
+			X0 = X1;
+		}
 		return Xopt;
 	}
 	catch (string ex_info)
@@ -614,20 +664,36 @@ solution golden(matrix(*ff)(matrix, matrix, matrix), double a0, double b0, doubl
 {
 	try
 	{
-		solution Xopt;
-		//int i = 0;//tak w instrukcji było
-		//double alpha = (pow(5, 0.5) - 1) / 2;
-		//double a = a0;
-		//double b = b0;
-		//double c = b - alpha * (b - a);
-		//double d = a + alpha * (b - a);
-		//matrix x(2, 1, 0);
+		solution Xopt, A, B, C, D;
+		double alpha = (pow(5, 0.5) - 1) / 2;
+		A.x = a0;
+		B.x = b0;
+		C.x = B.x - alpha * (B.x - A.x);
+		D.x = A.x + alpha * (B.x - A.x);
 
-		//while(true) {
-		//	
+		while (true) {
+			if (C.fit_fun(ff, ud1, ud2) < D.fit_fun(ff, ud1, ud2)) {
+				A.x = A.x;
+				B.x = D.x;
+				C.x = B.x - alpha * (B.x - A.x);
+				D.x = C.x;
+			}
+			else {
+				A.x = C.x;
+				B.x = B.x;
+				C.x = D.x;
+				D.x = A.x + alpha * (B.x - A.x);
+			}
 
-		//}
+			if ((B.x - A.x) < epsilon) {
+				Xopt = (A.x + B.x) / 2;
+				break;
+			}
 
+			if (solution::f_calls > Nmax) {
+				break;
+			}
+		}
 
 		return Xopt;
 	}

@@ -15,7 +15,7 @@ int main()
 {
 	try
 	{
-		lab3();
+		lab4();
 		std::cout << "\nskonczylo program\n";
 	}
 	catch (string EX_INFO)

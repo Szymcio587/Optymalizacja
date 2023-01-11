@@ -253,3 +253,64 @@ matrix ff3R(matrix X, matrix ud1, matrix ud2) {
 
 	return y;
 }
+
+matrix ff4T(matrix x, matrix ud1, matrix ud2)
+{
+	matrix y;
+
+	if (isnan(ud2(0, 0)))
+	{
+		y = pow(x(0) + 2 * x(1) - 7) + pow(2 * x(0) + x(1) - 5);
+	}
+	else
+	{
+		y = ff4T(ud2(0) + x * ud2(1), ud1, ud2);
+	}
+
+	return y;
+}
+
+matrix ff4R(matrix teta, matrix ud1, matrix ud2) {
+	matrix y;
+	int m = 100;//liczba kandydatów
+	int n = get_len(teta); //u nas =3
+	static matrix X(n, m), Y(n, m);
+
+	//odczyt pliku//
+	//czytamy pliki plik z x >> X, plik z y >> Y
+
+		double h;
+		y = 0;
+
+		for (int i = 0; i < m; i++) {
+			h = m2d(trans(teta)*X[i]);
+			h = 1.0 / (1.0 + exp(-h));
+			y = y - Y(0, i) * ln(h) - 1 - Y(0, i) * ln(1 - h);
+		}
+	y = y / m;
+	return y;
+}
+
+matrix gfR4(matrix teta, matrix ud1, matrix ud2) {
+	int m = 100;
+	int n = get_len(teta);
+	matrix g(n, 1);
+	static matrix X(n, m), Y(n, m);
+
+	//odczyt z plików
+	//czytamy X, Y z plików;
+
+	double h;
+	for (int j = 0; j < n; j++) {
+		for (int i = 0; i < m; i++) {
+			h = m2d(tans(teta)*X(i));
+			h = 1 / (1 + exp(-h));
+			g(j) = g(j) + X(j, i) * (h - Y(0, i));
+		}
+		g(j) = g(j) / m;
+	}
+}
+
+matrix df4(double t, matrix Y, matrix ud1, matrix ud2) {
+
+}

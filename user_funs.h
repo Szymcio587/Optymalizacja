@@ -25,3 +25,8 @@ void centroid(matrix vm, matrix v, int n, int vg);
 
 matrix df3(double t, matrix Y, matrix ud1, matrix ud2);
 matrix ff3R(matrix X, matrix ud1, matrix ud2);
+
+matrix ff4T(matrix x, matrix ud1, matrix ud2);
+matrix ff4R(matrix x, matrix ud1, matrix ud2);
+matrix gfR4(matrix teta, matrix ud1, matrix ud2);
+matrix df4(double t, matrix Y, matrix ud1, matrix ud2);
